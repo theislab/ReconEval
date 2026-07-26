@@ -8,8 +8,9 @@ gene-expression matrix it summarises. The benchmark covers three tasks
 Tasks
 -----
 
-1. **End-to-end reconstruction.** A single model (PCA, AE, scVI, nlscVI,
-   or mlscVI) encodes expression to a latent space and decodes back. The
+1. **End-to-end reconstruction.** A single model (PCA, AE, or a VAE
+   variant — scVI, nlscVI, mlscVI) encodes expression to a latent space and
+   decodes back. The
    latent grid is ``{10, 32, 128, 512, 2048}``.
    Drivers: ``experiments/01_end_to_end/``.
 2. **Foundation-model reconstruction.** A frozen FM (SE, scGPT,

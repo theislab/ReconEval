@@ -6,7 +6,7 @@ three benchmark settings shown in Fig 1c.
 ```
 experiments/
 ├── preprocessing/        # PBMC / LuCA / Tahoe data-preparation scripts
-├── 01_end_to_end/        # PCA / AE / scVI / nlscVI / mlscVI reconstruction
+├── 01_end_to_end/        # PCA / AE / VAE (scVI, nlscVI, mlscVI) reconstruction
 ├── 02_foundation_model/  # FM (SE / scGPT / scConcept / SCimilarity) + decoder
 └── 03_latent_shift/      # CellFlow / STATE perturbation prediction
 ```
@@ -71,12 +71,13 @@ on the Hydra CLI or symlink to your own data root before submitting.
 | Task | Conda env | Why |
 |---|---|---|
 | 01_end_to_end | `cstm_scvi_env` | torch + scvi-tools |
-| 02_foundation_model — SE | `cstm_scvi_env` | needs the `state` package |
-| 02_foundation_model — scGPT | `scgpt` | scgpt's pinned torch/cuda |
-| 02_foundation_model — scConcept | `scconcept_env` | concept package |
-| 02_foundation_model — SCimilarity | `scimilarity_env` | scimilarity package |
+| 02_foundation_model — SE (embed) | `reconeval-state` | needs the `arc-state` package |
+| 02_foundation_model — decoder (all FMs, MLP) | `cstm_scvi_env` | no FM package needed at train time; embeddings are pre-cached |
+| 02_foundation_model — scGPT | `reconeval-scgpt` | scgpt's pinned torch/cuda |
+| 02_foundation_model — scConcept | `reconeval-scconcept` | concept package + flash-attn |
+| 02_foundation_model — SCimilarity | `reconeval-scimilarity` | scimilarity package |
 | 03_latent_shift — CellFlow | `pancellflow` | JAX + cellflow |
-| 03_latent_shift — STATE | `cstm_scvi_env` | torch + STATE |
+| 03_latent_shift — STATE | `reconeval-state` | torch + STATE |
 
 ## Quick smoke test
 

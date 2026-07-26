@@ -6,7 +6,7 @@ perturbation covariate. Two methods are benchmarked:
 - **CellFlow** — JAX optimal-transport flow matching.
 - **STATE** — PyTorch transformer over cell sets.
 
-Both consume the same upstream embeddings (PCA / AE / scVI / nlscVI at
+Both consume the same upstream embeddings (PCA / AE / VAE at
 multiple latent dims, plus the four FMs).
 
 ## Layout

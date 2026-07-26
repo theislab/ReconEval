@@ -61,11 +61,12 @@ metric subgroups under `configs/metric/`.
 
 ## Step 1: embed
 
-Each FM has its own driver + Hydra config:
+Each FM has its own driver + Hydra config, and each ships in its OWN conda
+env because their torch/CUDA/flash-attn pins clash pairwise.
 
 ```bash
 # SE (uses the STATE package)
-STATE_SRC=/path/to/state/src conda activate cstm_scvi_env
+STATE_SRC=/path/to/state/src conda activate reconeval-state
 python experiments/02_foundation_model/codes/SE_emb.py \
   total_parts=1 parts=1 \
   data_args.output_dir=/path/to/SE_emb.zarr
@@ -118,7 +119,7 @@ top of the file before submitting.
 
 ```bash
 conda activate cstm_scvi_env
-RECONEVAL_OUT=/tmp/reconeval_smoke STATE_SRC=/lustre/groups/ml01/code/xiaotong.fu/state/src \
+RECONEVAL_OUT=/tmp/reconeval_smoke \
 python experiments/02_foundation_model/codes/decoderonly_hvg.py \
   pretrained=SE decoder=MLP data=pbmc \
   decoder.max_epochs=1 decoder.min_epochs=1
@@ -127,11 +128,33 @@ python experiments/02_foundation_model/codes/decoderonly_hvg.py \
 Expected output: an MLP decoder checkpoint under
 `${RECONEVAL_OUT}/weights/pbmc/SE_MLP/.../<filename>.ckpt`.
 
+## Reproduce a paper decoder from a released FM embedding
+
+`codes/train_decoder_from_embedding.py` is a self-contained argparse
+driver (no Hydra) intended for reproducibility on top of released FM
+embeddings — one command, one env (`cstm_scvi_env`), one checkpoint out.
+
+```bash
+conda activate cstm_scvi_env
+python experiments/02_foundation_model/codes/train_decoder_from_embedding.py \
+  --emb-train-zarr /path/to/pbmc_SE/ag/split02/train.zarr \
+  --emb-val-zarr   /path/to/pbmc_SE/ag/split02/val.zarr \
+  --all-genes-zarr /path/to/pbmc_w_ag/comb_w_obs.zarr \
+  --target-genes-zarr /path/to/pbmc/comb_w_obs.zarr \
+  --embedding-key SE \
+  --latent-dim 128 \
+  --out $RECONEVAL_OUT/decoder/pbmc/SE/split02/MLP \
+  --epochs 500
+```
+
+See `train_decoder_from_embedding.py --help` for all flags.
+
 ## Conda envs
 
 | Env | Drivers |
 |---|---|
-| `cstm_scvi_env` | `SE_emb*`, `decoderonly_*` (needs the `state` package) |
-| `scgpt` | `scGPT_emb.py` |
-| `scconcept_env` | `scConcept_emb.py` |
-| `scimilarity_env` | `scimilarity_emb.py` |
+| `cstm_scvi_env` | `decoderonly_hvg.py`, `train_decoder_from_embedding.py` (decoder-only training; no FM package needed at train time) |
+| `reconeval-state` | `SE_emb.py`, `SE_emb_adata.py` (STATE FM embedder) |
+| `reconeval-scgpt` | `scGPT_emb.py` |
+| `reconeval-scconcept` | `scConcept_emb.py`, `decoderonly_hvg_tsfm.py` |
+| `reconeval-scimilarity` | `scimilarity_emb.py` |

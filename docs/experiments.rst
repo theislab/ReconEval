@@ -10,7 +10,7 @@ lists the drivers in detail.
 
     experiments/
     ├── preprocessing/        # PBMC / LuCA / Tahoe data preparation
-    ├── 01_end_to_end/        # PCA / AE / scVI / nlscVI / mlscVI
+    ├── 01_end_to_end/        # PCA / AE / VAE (scVI, nlscVI, mlscVI)
     │   ├── codes/            # train.py + eval_*.py
     │   ├── configs/          # Hydra (model/, data/, trainer/, metric/)
     │   └── submit/           # *.sbatch wrappers + pbmc_search.sh sweep
@@ -26,7 +26,7 @@ lists the drivers in detail.
 01 — End-to-end reconstruction
 ------------------------------
 
-PCA, AE, VAE (scVI implementation) across the latent grid
+PCA, AE, VAE (scVI, nlscVI, mlscVI variants) across the latent grid
 ``{10, 32, 128, 512, 2048}`` on PBMC, Tahoe or LuCA.
 ``submit/pbmc_search.sh`` expands the 5-model × 5-latent grid into
 separate jobs.
@@ -44,7 +44,7 @@ The Hydra ``--multirun`` sweep over decoder width / depth is in
 
 CellFlow or STATE predict the post-perturbation latent state, which is
 then decoded back to expression. Both methods read the same upstream
-embeddings (PCA / AE / scVI / nlscVI at multiple latent dims, plus the
+embeddings (PCA / AE / VAE (scVI, nlscVI) at multiple latent dims, plus the
 four FMs) and condition on a perturbation covariate.
 
 Preprocessing

@@ -7,7 +7,7 @@ figures from cached metric CSVs. No model is retrained.
 ==============================================================  ==========================================
 Setting (Fig 1c)                                                Notebook
 ==============================================================  ==========================================
-End-to-end reconstruction (PCA / AE / scVI / nlscVI / mlscVI)   ``analysis/data/plots/fig2_clean.ipynb``
+End-to-end reconstruction (PCA / AE / VAE)                      ``analysis/data/plots/fig2_clean.ipynb``
 Foundation-model reconstruction (frozen FM + decoder)           ``analysis/data/plots/fig3_clean.ipynb``
 Latent-shift reconstruction (CellFlow + STATE)                  ``analysis/data/plots/fig4_clean.ipynb``
 ==============================================================  ==========================================

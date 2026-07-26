@@ -91,7 +91,7 @@ in ``experiments/``, organised by task:
 Folder                                          What it contains
 ==============================================  ============================================================
 ``experiments/preprocessing/``                  PBMC / LuCA / Tahoe data-preparation scripts.
-``experiments/01_end_to_end/``                  PCA / AE / scVI / nlscVI / mlscVI end-to-end reconstruction.
+``experiments/01_end_to_end/``                  PCA / AE / VAE (scVI, nlscVI, mlscVI) reconstruction.
 ``experiments/02_foundation_model/``            FM (SE, scGPT, scConcept, SCimilarity) embed + decoder train.
 ``experiments/03_latent_shift/``                CellFlow / STATE latent-shift reconstruction.
 ==============================================  ============================================================

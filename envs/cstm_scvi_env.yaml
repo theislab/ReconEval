@@ -35,6 +35,11 @@ dependencies:
   - lightning=2.5.*
   - torchmetrics=1.6.*
   - scvi-tools=1.3.*
+  # torchmetrics 1.6 imports transformers via its text.bert submodule; the
+  # transformers wheel bundled in this env requires huggingface-hub<1.0, so
+  # pin it explicitly to avoid `ImportError: huggingface-hub>=0.30.0,<1.0
+  # is required` at import time.
+  - huggingface_hub<1.0
   # Hydra + logging
   - hydra-core=1.3.*
   - omegaconf=2.3.*
@@ -46,7 +51,8 @@ dependencies:
       - omnipath==1.0.12
       - blitzgsea==1.3.54
       - cellxgene-census==1.17.0
-      # STATE FM (foundation model embedder)
-      - arc-state==0.9.31
       # Install the public ReconEval package itself in editable mode
       - -e ..
+# STATE FM (SE) is now packaged separately in envs/state_env.yaml —
+# its torch/CUDA pins would otherwise conflict with future upgrades of
+# this env. See envs/README.md.

@@ -1,7 +1,7 @@
 # 01_end_to_end — full-gene reconstruction
 
-Trains five end-to-end reconstruction models — **PCA**, **AE**, **scVI**,
-**nlscVI**, **mlscVI** — across the latent grid `{10, 32, 128, 512, 2048}`
+Trains five end-to-end reconstruction models — **PCA**, **AE** and three
+VAE variants (**scVI**, **nlscVI**, **mlscVI**) — across the latent grid `{10, 32, 128, 512, 2048}`
 on PBMC, Tahoe or LuCA. The decoder is trained jointly with the encoder.
 
 ## Layout

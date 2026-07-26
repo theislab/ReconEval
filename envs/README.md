@@ -7,7 +7,8 @@ env.
 
 | File | Purpose | Drivers / Tutorials |
 |---|---|---|
-| `cstm_scvi_env.yaml` | End-to-end models (PCA, AE, scVI, nlscVI, mlscVI), SE FM embed, MLP decoder, STATE training | `experiments/01_end_to_end/codes/*`, `02_foundation_model/codes/SE_emb*.py`, `decoderonly_hvg.py`, `03_latent_shift/codes/train_st.py`, all tutorials |
+| `cstm_scvi_env.yaml` | End-to-end models (PCA, AE, VAE (scVI, nlscVI, mlscVI)), MLP decoder, STATE training | `experiments/01_end_to_end/codes/*`, `02_foundation_model/codes/decoderonly_hvg.py`, `train_decoder_from_embedding.py`, `03_latent_shift/codes/train_st.py`, all tutorials |
+| `state_env.yaml` | STATE (SE) FM embed | `02_foundation_model/codes/SE_emb*.py` |
 | `scgpt.yaml` | scGPT FM embed | `02_foundation_model/codes/scGPT_emb.py` |
 | `scconcept_env.yaml` | scConcept FM embed + Transformer decoder | `02_foundation_model/codes/scConcept_emb.py`, `decoderonly_hvg_tsfm.py` |
 | `scimilarity_env.yaml` | SCimilarity FM embed | `02_foundation_model/codes/scimilarity_emb.py` |
@@ -23,7 +24,8 @@ pip install -r envs/requirements-min.txt
 # Full end-to-end stack (most users want this):
 conda env create -f envs/cstm_scvi_env.yaml
 
-# FM-specific envs as needed:
+# FM-specific envs as needed (each FM has its own to avoid torch/CUDA conflicts):
+conda env create -f envs/state_env.yaml       # STATE / SE FM
 conda env create -f envs/scgpt.yaml
 conda env create -f envs/scconcept_env.yaml
 conda env create -f envs/scimilarity_env.yaml

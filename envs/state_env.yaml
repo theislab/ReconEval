@@ -1,0 +1,36 @@
+name: reconeval-state
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy=2.0.*
+  - pandas=2.2.*
+  - scipy=1.15.*
+  - scikit-learn=1.5.*
+  - matplotlib=3.10.*
+  - tqdm=4.67.*
+  - pyyaml=6.0.*
+  # Single-cell I/O
+  - anndata=0.12.*
+  - scanpy=1.11.*
+  - h5py=3.12.*
+  - zarr=2.18.*
+  - numcodecs=0.15.*
+  # Torch stack pinned to STATE's supported version
+  - pytorch=2.5.*
+  - pytorch-cuda=12.4
+  - lightning=2.5.*
+  - torchmetrics=1.6.*
+  # Config
+  - hydra-core=1.3.*
+  - omegaconf=2.3.*
+  - wandb=0.19.*
+  - pip
+  - pip:
+      # The STATE foundation model (Arc Institute).
+      # https://github.com/ArcInstitute/state
+      - arc-state==0.9.31
+      # Install the public ReconEval package itself in editable mode
+      - -e ..
