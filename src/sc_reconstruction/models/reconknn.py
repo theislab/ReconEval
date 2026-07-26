@@ -1,10 +1,15 @@
 import h5py
-import cupy as cp
 import numpy as np
-import cuml as cm
 import anndata as ad
 
 from tqdm import tqdm
+
+try:  # GPU-only (RAPIDS/CUDA) deps; optional so the package imports on CPU
+    import cupy as cp
+    import cuml as cm
+except ImportError:  # pragma: no cover - CPU-only environments
+    cp = None
+    cm = None
 
 class ReconKNN():
     def __init__(self, n_neighbors: int = 5, metric: str = 'euclidean',

@@ -32,17 +32,20 @@ dependencies = [
     "pot",
     "zarr",
     "numcodecs",
-    "lightning",
-    "torch",
-    "scvi-tools",
-    "dask",
     "omegaconf",
-    "geomloss",
-    "cupy-cuda12x",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
+# Deep-learning stack (torch etc.). Kept out of core so lightweight consumers
+# — e.g. the OpenProblems metric/PCA Docker images — install a small, fast
+# footprint. The dataloaders/models already guard these imports at runtime.
+# Components that need them (autoencoder, scvi) install them explicitly.
+dl = ["torch", "lightning", "scvi-tools", "dask", "geomloss"]
+# GPU-only acceleration (RAPIDS/CUDA). Not installable on CPU-only hosts,
+# so it is an opt-in extra rather than a core dependency; this keeps
+# `pip install .` (and the OpenProblems Docker images) working on CPU.
+gpu = ["cupy-cuda12x"]
 docs = [
     "sphinx>=7",
     "pydata-sphinx-theme>=0.15",
@@ -67,13 +70,11 @@ Source = "https://github.com/theislab/ReconEval"
 Issues = "https://github.com/theislab/ReconEval/issues"
 
 [tool.hatch.build.targets.wheel]
+# The src-layout `packages` entry already maps `src/sc_reconstruction` to
+# `sc_reconstruction/...` in the wheel. A `force-include` of the same path
+# duplicates every file (e.g. `sc_reconstruction/__init__.py`) and makes the
+# wheel build fail, which in turn breaks `pip install git+…/ReconEval`.
 packages = ["src/sc_reconstruction"]
-
-# Hatchling needs an explicit mapping for the src-layout so the wheel
-# contains `sc_reconstruction/...` and `pip install [-e] .` resolves
-# imports correctly.
-[tool.hatch.build.targets.wheel.force-include]
-"src/sc_reconstruction" = "sc_reconstruction"
 
 [tool.hatch.version]
 source = "vcs"
