@@ -56,6 +56,53 @@ LuCA            6 tissues, 4 diseases         Human Lung Cancer Atlas
 * *Biological* — DEG recovery, coexpression structure, cell-cycle composition, cytokine response, pathway activity
 * *Perturbational* — KNN purity 
 
+System requirements
+===================
+
+* Linux (Rocky Linux 9.6 tested); Python 3.12; PyTorch 2.5 + CUDA 12.4.
+  Full pins per env in ``envs/*.yaml``.
+* An NVIDIA GPU is required for training. Metrics + tutorials run on CPU.
+
+Installation
+============
+
+Install time: ~2 min (metrics only), ~30 min (full training env).
+
+.. code-block:: bash
+
+   pip install -r envs/requirements-min.txt        # metrics only
+   conda env create -f envs/cstm_scvi_env.yaml     # full training env
+
+Demo
+====
+
+Runtime: ~5 min on CPU.
+
+Before running, fetch the small demo fixtures from Hugging Face
+(``luca_demo.h5ad``, ``cytokine_act_merged.csv``,
+``regev_lab_cell_cycle_genes.txt``) into ``analysis/data/frozen/`` — see
+the *Reproducibility* section below.
+
+.. code-block:: bash
+
+   jupyter lab tutorials/metrics.ipynb
+
+Expected output: per-metric scores + a ``funky_heatmap`` figure.
+
+Instructions for use
+====================
+
+Metrics on your own ``(true, reconstructed)`` AnnData pair:
+
+.. code-block:: python
+
+   from sc_reconstruction.metrics import compute_all_metrics
+   scores = compute_all_metrics(adata_true, adata_pred)
+
+For training: see ``experiments/{01_end_to_end, 02_foundation_model,
+03_latent_shift}/README.md``.
+Reproduction of paper figures: see *Reproducibility* below.
+
 Tutorials
 =========
 
