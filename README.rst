@@ -153,9 +153,7 @@ Reproducibility
 Three notebooks under ``analysis/data/plots/`` reproduce the paper's
 figures from cached metric CSVs and lookup tables hosted on
 `huggingface.co/datasets/theislab/ReconEval
-<https://huggingface.co/datasets/theislab/ReconEval>`_. Download those
-into ``analysis/frozen/``; the notebooks write SVGs to
-``analysis/figs/figN/``. No model is retrained.
+<https://huggingface.co/datasets/theislab/ReconEval>`_.
 
 Run them from ``analysis/data/plots/`` so the relative paths
 ``../frozen/`` and ``../figs/`` resolve.
