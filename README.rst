@@ -143,10 +143,6 @@ Folder                                          What it contains
 ``experiments/03_latent_shift/``                CellFlow / STATE latent-shift reconstruction.
 ==============================================  ============================================================
 
-Each task has its own ``configs/``, ``codes/`` and ``submit/`` tree
-(Hydra configs, Python drivers, sbatch wrappers, eval scripts). See
-each task's ``README.md`` for env, data and CLI override notes.
-
 Reproducibility
 ===============
 
@@ -154,9 +150,6 @@ Three notebooks under ``analysis/data/plots/`` reproduce the paper's
 figures from cached metric CSVs and lookup tables hosted on
 `huggingface.co/datasets/theislab/ReconEval
 <https://huggingface.co/datasets/theislab/ReconEval>`_.
-
-Run them from ``analysis/data/plots/`` so the relative paths
-``../frozen/`` and ``../figs/`` resolve.
 
 ==========================================================  =====================================================  =============================
 Setting (Fig 1c)                                            Notebook                                               Figures produced
