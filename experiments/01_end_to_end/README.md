@@ -53,7 +53,7 @@ metric subgroup (`configs/metric/*.yaml`). Example:
 
 ```bash
 python experiments/01_end_to_end/codes/eval_distributional.py \
-  data=pbmc split=split03 model=train/AE +metric=distributional
+  data=pbmc split=split03 model=train/AE +metric=_distributional
 ```
 
 ## CLI
