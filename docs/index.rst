@@ -61,6 +61,7 @@ representations. The package contains:
     :hidden:
 
     installation
+    custom_datasets
     overview
     tutorials/index
     api/index
