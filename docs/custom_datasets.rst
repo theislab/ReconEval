@@ -1,30 +1,57 @@
-Use custom data
-===============
+Custom data
+===========
 
-Choose a task:
+Hands-on examples
+-----------------
 
-- **End-to-end reconstruction**: train an encoder and decoder on your data
-- **Foundation model**: train a decoder on pretrained foundation-model
-  embeddings
-- **Latent shift**: train a perturbation predictor on precomputed
-  embeddings, then map its predictions to gene expression using the
-  corresponding pretrained decoder
+Start with hands-on examples:
 
-Follow these steps for your chosen task:
+.. grid:: 1 1 3 3
+   :gutter: 2
 
-- :ref:`Set up the environment <custom-data-installation>`
-- Prepare your **preprocessed** input data
-- Choose and train a model via Python CLI or :ref:`SLURM <slurm-parameters>`
-- Prepare a :ref:`reference projector <custom-data-e2e-reference-pca>` (if applicable)
-- Evaluate reconstruction on held-out data
-- Optionally extract embeddings for downstream tasks
+   .. grid-item-card:: End-to-end reconstruction
+      :link: custom_datasets/examples/end_to_end
+      :link-type: doc
+      :text-align: center
+      :class-body: sd-d-flex-column sd-align-major-center
+      :class-title: sd-mb-0
 
-The examples use ``mydata`` as the dataset name and ``/path/to/...`` for
+   .. grid-item-card:: Foundation model
+      :link: custom_datasets/examples/foundation_model
+      :link-type: doc
+      :text-align: center
+      :class-body: sd-d-flex-column sd-align-major-center
+      :class-title: sd-mb-0
+
+   .. grid-item-card:: Latent shift
+      :link: custom_datasets/examples/latent_shift
+      :link-type: doc
+      :text-align: center
+      :class-body: sd-d-flex-column sd-align-major-center
+      :class-title: sd-mb-0
+
+Instructions
+------------
+
+Or follow the general instructions for your own data:
+
+- :doc:`Set up environments <custom_datasets/prerequisites>`
+- Choose a guide for your preprocessed data:
+
+  - :doc:`End-to-end reconstruction <custom_datasets/end_to_end>`
+  - :doc:`Foundation model <custom_datasets/foundation_model>`
+  - :doc:`Latent shift <custom_datasets/latent_shift>`
+
+- :doc:`Run through SLURM <custom_datasets/slurm>` (optional)
+
+The instructions use ``mydata`` as the dataset name and ``/path/to/...`` for
 paths; replace these placeholders with your own values.
 
 .. toctree::
    :maxdepth: 1
+   :hidden:
 
+   custom_datasets/examples
    custom_datasets/prerequisites
    custom_datasets/end_to_end
    custom_datasets/foundation_model

@@ -1,11 +1,11 @@
 .. _custom-data-installation:
 
-Set up prerequisites
---------------------
+Set up environments
+-------------------
 
 :doc:`Back to introduction <../custom_datasets>`
 
-To create environment check the following instructions:
+For environment setup, see:
 
-- Environments `README <https://github.com/theislab/ReconEval/blob/main/envs/README.md>`_ in the ReconEval repository
-- :doc:`../installation`
+| `Environments README <https://github.com/theislab/ReconEval/blob/main/envs/README.md>`_
+| :doc:`Installation guide <../installation>`
