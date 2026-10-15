@@ -11,7 +11,7 @@ and :ref:`dataset configuration <custom-data-e2e-data-config>`.
 
 After completing the :ref:`PCA setup <custom-data-e2e-pca-setup>`,
 run from the repository root in GPU-enabled ``reconeval``, directly
-or through :ref:`SLURM <slurm-parameters>`.
+or through :ref:`Slurm <slurm-parameters>`.
 
 The example fits 50 components. Replace ``<output_root>`` with the absolute
 path to your :ref:`output directory <custom-data-e2e-model-files>`:

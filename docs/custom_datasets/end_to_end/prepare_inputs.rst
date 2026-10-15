@@ -50,12 +50,14 @@ Place both under your dataset directory:
   /path/to/mydata/
   ├── expression.zarr/
   │   ├── <group>/
-  │   │   └── X          # cells × genes
+  │   │   ├── X          # cells × genes
   │   │   └── obs_index  # optional cell IDs
-  │   └── ...
+  │   ├── ...            # other groups
+  │   ├── .zattrs        # gene metadata, including var_names
+  │   └── .zgroup        # Zarr format information
   ├── split_metadata.zarr/
-  │   ├── .zgroup        # Zarr format information
-  │   └── .zattrs        # train/val/test group-name lists
+  │   ├── .zattrs        # train/val/test group-name lists
+  │   └── .zgroup        # Zarr format information
   └── ...                # train.zarr, val.zarr, test.zarr (Optional)   
 
 
@@ -90,13 +92,51 @@ Expression store includes:
 
 - ``<group>/X``: cells-by-genes expression
 - ``<group>/obs_index``: optional cell IDs in matching row order
-- Root ``var_names`` attribute: ordered gene names for biological evaluation
+- ``var_names`` in ``.zattrs``: gene names in the same order as the columns
+  of ``X``, used for biological evaluation
+- ``.zgroup``: Zarr format information
+
+.. dropdown:: Examples: metadata files
+   :color: primary
+
+   .. tab-set::
+
+      .. tab-item:: <group>/obs_index
+
+         Optional cell IDs for the corresponding rows of ``X``:
+
+         .. code-block:: text
+
+            ["cell_001", "cell_002", "cell_003"]
+
+         The number of IDs must equal the number of rows in ``X``, in
+         matching order.
+
+      .. tab-item:: .zattrs
+
+         Placeholder gene names for the corresponding columns of ``X``:
+
+         .. code-block:: json
+
+            {
+              "var_names": ["GENE_A", "GENE_B", "GENE_C"]
+            }
+
+      .. tab-item:: .zgroup
+
+         Zarr format version 2:
+
+         .. code-block:: json
+
+            {
+              "zarr_format": 2
+            }
 
 **Split metadata**
 
 Create ``split_metadata.zarr`` using the Zarr library. It should contain:
 
-- ``.zattrs``: train/val/test group-name lists:
+- ``.zattrs` (train/val/test group-name lists):
 
   - ``train_combinations``
   - ``val_combinations``
@@ -104,24 +144,30 @@ Create ``split_metadata.zarr`` using the Zarr library. It should contain:
 
 - ``.zgroup``: Zarr format information
 
-Example ``.zattrs`` contents:
+.. dropdown:: Examples: split metadata files
+   :color: primary
 
-.. code-block:: json
+   .. tab-set::
 
-   {
-     "train_combinations": ["T_cell-study1-tumor"],
-     "val_combinations": ["T_cell-study2-tumor"],
-     "test_combinations": ["T_cell-study3-tumor"]
-   }
+      .. tab-item:: .zattrs
 
-Example ``.zgroup`` contents (Zarr format version 2):
+         .. code-block:: json
 
-.. code-block:: json
+            {
+              "train_combinations": ["T_cell-study1-tumor"],
+              "val_combinations": ["T_cell-study2-tumor"],
+              "test_combinations": ["T_cell-study3-tumor"]
+            }
 
-   {
-     "zarr_format": 2
-   }
+      .. tab-item:: .zgroup
 
+         Zarr format version 2:
+
+         .. code-block:: json
+
+            {
+              "zarr_format": 2
+            }
 
 For different split definitions, reuse the expression
 store and recreate separate split metadata.

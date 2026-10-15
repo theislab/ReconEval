@@ -3,13 +3,16 @@ Evaluate
 
 :doc:`Back to End-to-end reconstruction <../end_to_end>`
 
+**Overview**
+
 The evaluation consists of two steps:
 
 - Reconstruct the held-out data
 - Score the measured and reconstructed expression
 
-To explore a demo using the LuCA dataset, see the :doc:`End-to-end tutorial <../../tutorials/end_to_end>`.
 This section explains how to configure and run the evaluation scripts via the Python CLI, using outputs from the previous sections.
+
+**Metrics**
 
 For end-to-end evaluation, the framework supports:
 
@@ -114,6 +117,9 @@ Set the parameters in YAML or pass them as ``key=value`` on the CLI:
 
          YAML: ``base_eval.yaml``
 
+         Keep this base YAML unchanged and pass the parameters below as
+         ``key=value`` CLI overrides.
+
          .. csv-table::
             :header: "Parameter", "Required / optional", "Value / meaning"
             :widths: 40, 25, 35
@@ -193,7 +199,7 @@ Run
 ^^^
 
 Run from the repository root in the ``reconeval`` environment, or follow
-:ref:`Run through SLURM <slurm-parameters>`.
+:ref:`Run through Slurm <slurm-parameters>`.
 
 **Distributional metrics**
 
@@ -245,7 +251,7 @@ Example:
      split="split0X" \
      output.save_path="/path/to/results/mydata/<model>_coexpression.csv"
 
-- For another biological metric, select its configuration under ``experiments/01_end_to_end/configs/metric/`` and supply its required references/annotations 
+- For another biological metric, select its configuration under ``experiments/01_end_to_end/configs/metric/`` and supply its required references/annotations (e.g. control groups for DEG evaluation or a signature CSV for cytokine evaluation) 
 - See the :doc:`Metrics tutorial <../../tutorials/metrics>` for examples
 
 Outputs

@@ -42,7 +42,7 @@ Or follow the general instructions for your own data:
   - :doc:`Foundation model <custom_datasets/foundation_model>`
   - :doc:`Latent shift <custom_datasets/latent_shift>`
 
-- :doc:`Run through SLURM <custom_datasets/slurm>` (optional)
+- :doc:`Run through Slurm <custom_datasets/slurm>` (optional)
 
 The instructions use ``mydata`` as the dataset name and ``/path/to/...`` for
 paths; replace these placeholders with your own values.

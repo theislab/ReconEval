@@ -52,7 +52,7 @@ Run
 ^^^
 
 Run from the repository root in the ``reconeval`` environment, or follow
-:ref:`Run through SLURM <slurm-parameters>`.
+:ref:`Run through Slurm <slurm-parameters>`.
 
 Example for AE variants or nlscVI:
 

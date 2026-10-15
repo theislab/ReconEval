@@ -3,6 +3,8 @@ Train
 
 :doc:`Back to End-to-end reconstruction <../end_to_end>`
 
+To explore a demo using the LuCA dataset, see the :doc:`End-to-end tutorial <../../tutorials/end_to_end>`.
+
 Configure
 ^^^^^^^^^
 
@@ -18,7 +20,7 @@ Choose a model:
 - **VAE variants:** **nlscVI** (no library-size), **mlscVI** (modeled library size), **scVI** (observed library size)
 - **PCA**
 
-For a custom model, see `Bringing your own model <../../tutorials/end_to_end.html#bringing-your-own-model>`_
+For a custom model, see `Bringing your own model <../../tutorials/end_to_end.html#bringing-your-own-model>`_.
 
 **Parameters**
 
@@ -126,13 +128,13 @@ Run
 Activate ``reconeval`` using ``cstm_scvi_env.yaml`` from the
 :ref:`installation step <custom-data-installation>` and run from the
 repository root. For cluster submission, follow
-:ref:`Run through SLURM <slurm-parameters>`.
+:ref:`Run through Slurm <slurm-parameters>`.
 
 ``data=mydata`` selects ``configs/data/mydata.yaml`` as the dataset configuration.
 
 **Run with a YAML configuration**
 
-For example, train a <model> with your ``mydata.yaml`` configuration:
+For example, train a ``<model>`` with your ``mydata.yaml`` configuration:
 
 .. code-block:: bash
 

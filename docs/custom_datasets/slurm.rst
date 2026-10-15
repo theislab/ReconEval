@@ -1,6 +1,6 @@
 .. _slurm-parameters:
 
-Run through SLURM (optional)
+Run through Slurm (optional)
 ----------------------------
 
 :doc:`Back to introduction <../custom_datasets>`

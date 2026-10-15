@@ -5,7 +5,7 @@ Run CellFlow from CLI
 
 :doc:`Back to Latent shift <../latent_shift>`
 
-For cluster submission, follow :ref:`Run through SLURM <slurm-parameters>`.
+For cluster submission, follow :ref:`Run through Slurm <slurm-parameters>`.
 
 **Run CellFlow:**
 
