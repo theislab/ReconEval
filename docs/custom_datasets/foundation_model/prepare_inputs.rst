@@ -5,6 +5,9 @@ Prepare inputs
 
 :doc:`Back to Foundation model <../foundation_model>`
 
+For general preprocessing of lightweight datasets with ``prepare_dataset.py``,
+see :doc:`Data preparation <../dataset_preparation>`.
+
 Extraction of embeddings
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -134,7 +137,9 @@ separate split metadata.
 Decoder training
 ^^^^^^^^^^^^^^^^
 
-Provide training and validation expression with matching embeddings:
+Provide training and validation expression with matching embeddings.
+See :doc:`Combine expression and embeddings <combine_embeddings>` to create
+these stores:
 
 .. code-block:: text
 

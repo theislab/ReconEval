@@ -13,6 +13,7 @@ The workflow includes:
    foundation_model/prepare_inputs
    foundation_model/data_configuration
    foundation_model/extract_embeddings
+   foundation_model/combine_embeddings
    foundation_model/train
    foundation_model/reference_pca
    foundation_model/evaluate

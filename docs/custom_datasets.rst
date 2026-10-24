@@ -1,6 +1,17 @@
 Custom data
 ===========
 
+Before you start
+----------------
+
+:doc:`Set up the environment <custom_datasets/prerequisites>` before running workflows.
+
+Data preparation
+----------------
+
+For lightweight datasets, follow :doc:`Data preparation
+<custom_datasets/dataset_preparation>` to prepare the input files.
+
 Hands-on examples
 -----------------
 
@@ -30,30 +41,28 @@ Start with hands-on examples:
       :class-body: sd-d-flex-column sd-align-major-center
       :class-title: sd-mb-0
 
-Instructions
-------------
+Advanced usage
+--------------
 
-Or follow the general instructions for your own data:
+Or follow the advanced instructions for your own data:
 
-- :doc:`Set up environments <custom_datasets/prerequisites>`
-- Choose a guide for your preprocessed data:
-
-  - :doc:`End-to-end reconstruction <custom_datasets/end_to_end>`
-  - :doc:`Foundation model <custom_datasets/foundation_model>`
-  - :doc:`Latent shift <custom_datasets/latent_shift>`
-
-- :doc:`Run through Slurm <custom_datasets/slurm>` (optional)
+- :doc:`End-to-end reconstruction <custom_datasets/end_to_end>`
+- :doc:`Foundation model <custom_datasets/foundation_model>`
+- :doc:`Latent shift <custom_datasets/latent_shift>`
 
 The instructions use ``mydata`` as the dataset name and ``/path/to/...`` for
 paths; replace these placeholders with your own values.
+
+Running on a cluster (optional)
+-------------------------------
+To run on a cluster with Slurm support, follow :doc:`the Slurm guide <custom_datasets/slurm>`.
 
 .. toctree::
    :maxdepth: 1
    :hidden:
 
+   Environment setup <custom_datasets/prerequisites>
+   Data preparation <custom_datasets/dataset_preparation>
    custom_datasets/examples
-   custom_datasets/prerequisites
-   custom_datasets/end_to_end
-   custom_datasets/foundation_model
-   custom_datasets/latent_shift
+   custom_datasets/advanced_usage
    custom_datasets/slurm

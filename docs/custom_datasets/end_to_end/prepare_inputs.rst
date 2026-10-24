@@ -3,6 +3,10 @@ Prepare inputs
 
 :doc:`Back to End-to-end reconstruction <../end_to_end>`
 
+This page describes the input formats required by the end-to-end workflow.
+For general preprocessing of lightweight datasets with ``prepare_dataset.py``,
+see :doc:`Data preparation <../dataset_preparation>`.
+
 .. _custom-data-e2e-training-inputs:
 
 Training
@@ -58,7 +62,7 @@ Place both under your dataset directory:
   ├── split_metadata.zarr/
   │   ├── .zattrs        # train/val/test group-name lists
   │   └── .zgroup        # Zarr format information
-  └── ...                # train.zarr, val.zarr, test.zarr (Optional)   
+  └── ...                # train.zarr, val.zarr, test.zarr (Optional)
 
 
 .. dropdown:: Note: Held-out evaluation parameters
@@ -136,7 +140,7 @@ Expression store includes:
 
 Create ``split_metadata.zarr`` using the Zarr library. It should contain:
 
-- ``.zattrs` (train/val/test group-name lists):
+- ``.zattrs`` (train/val/test group-name lists):
 
   - ``train_combinations``
   - ``val_combinations``

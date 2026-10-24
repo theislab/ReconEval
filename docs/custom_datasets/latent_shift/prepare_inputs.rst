@@ -5,6 +5,9 @@ Add expression, embeddings, and conditions
 
 :doc:`Back to Latent shift <../latent_shift>`
 
+For general preprocessing of lightweight datasets with ``prepare_dataset.py``,
+see :doc:`Data preparation <../dataset_preparation>`.
+
 1. Choose a representation and width from the training script's ``EMB_DIMS``
    and prepare the corresponding embeddings (e.g. ``AE_128``)
 2. Provide the following files for STATE and CellFlow:
