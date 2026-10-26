@@ -1,0 +1,13 @@
+defaults:
+  - luca
+  - _self_
+
+# Demo subset: 500 cells x 500 HVGs, relative paths from repository root
+path: data/luca/demo
+eval_path: data/luca/demo/expression.zarr
+split_comb: data/luca/demo/split_metadata.zarr
+input_dim: 500
+
+model_specific:
+  PCA:
+    train_path: data/luca/demo/expression.h5ad  # single combined h5ad for sklearn PCA

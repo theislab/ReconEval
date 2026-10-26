@@ -1,0 +1,35 @@
+# @package _global_
+# Demo-specific evaluation config for the 500-cell / 500-gene LuCA subset.
+# Extends base_eval.yaml; override model/metric on the CLI.
+#
+# Usage:
+#   python experiments/01_end_to_end/codes/eval_distributional.py \
+#       --config-dir custom_datasets_demo/01_end_to_end/configs \
+#       --config-name base_eval_demo \
+#       model=eval/AE \
+#       model.meta.name=mlAE \
+#       metric=_distributional \
+#       'metric.projector.load.path=[<mean.zarr>,<pc_50.zarr>]' \
+#       model.load.path=<checkpoint.ckpt> \
+#       model.load.model_name=<name> \
+#       output.save_path=<results.csv>
+
+defaults:
+  - base_eval
+  - override data: custom_luca_demo
+  - _self_
+
+# Evaluate on test split only
+train_fraction: 0
+test_fraction: 1.0
+
+# e2e models reconstruct from their own latent space; no external embeddings
+emb_zarr_path: null
+
+# These checkpoints are trained with the current modeled-library forward path.
+legacy_mlae_forward: false
+
+# Override the metric evaluator mode for reconstruction scoring
+metric:
+  evaluator:
+    mode: reconstruction
