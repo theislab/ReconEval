@@ -6,6 +6,10 @@ the zarr / h5ad inputs that the training drivers under
 
 ```
 preprocessing/
+├── prepare_dataset.py    # universal pipeline for luca/pbmc (replaces preprocess_*.py)
+├── combine_emb_zarr.py   # combine expression and embeddings for decoder training
+├── configs/              # Hydra configs: base.yaml, data/luca.yaml, data/pbmc.yaml
+├── utils/                # dataset-specific hooks: luca.py, pbmc.py
 ├── preprocess_pbmc.py    # PBMC-10M: normalize, log1p, HVG, zarr per (cell_type, donor, cytokine)
 ├── preprocess_luca.py    # LuCA: same pattern; splits per study/disease/tissue
 ├── zarr_to_h5ad.py       # zarr → h5ad helper used by all three pipelines
@@ -24,6 +28,13 @@ preprocessing/
 ```
 
 ## Usage
+
+For luca and pbmc, use `prepare_dataset.py` with Hydra configs:
+
+```bash
+python prepare_dataset.py --config-name data/luca
+python prepare_dataset.py --config-name data/pbmc
+```
 
 `preprocess_pbmc.py` and `preprocess_luca.py` are notebook-converted scripts —
 read them top-to-bottom; the cell markers (`# In[N]:`) trace back to the
