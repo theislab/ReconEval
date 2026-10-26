@@ -45,7 +45,7 @@ Replace ``<model>`` with ``SE``, ``scGPT``, ``scConcept``, or ``scimilarity``:
 
 .. code-block:: bash
 
-   python experiments/02_foundation_model/codes/combine_emb_zarr.py \
+   python experiments/preprocessing/combine_emb_zarr.py \
        --expression-zarr /path/to/mydata/expression_for_fm.zarr \
        --split-meta-zarr /path/to/mydata/split_metadata.zarr \
        --embedding-zarr "/path/to/mydata/embeddings/<model>/grouped.zarr" \

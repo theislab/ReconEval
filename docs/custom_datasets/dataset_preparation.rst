@@ -25,12 +25,13 @@ Use:
 Configure
 -----------
 
-Create ``experiments/preprocessing/configs/mydata.yaml`` using ``base.yaml``; replace the paths, grouping columns and other parameters with your own values:
+Create ``experiments/preprocessing/configs/data/mydata.yaml`` using ``configs/base.yaml``; replace the paths, grouping columns and other parameters with your own values:
 
 .. code-block:: yaml
 
+   # @package _global_
    defaults:
-     - base
+     - /base
      - _self_
 
    input: /path/to/input.h5ad
@@ -70,7 +71,7 @@ Create ``experiments/preprocessing/configs/mydata.yaml`` using ``base.yaml``; re
 - ``demo``: randomly sample cells before preprocessing (default: ``false``)
 - ``demo_cells``: maximum number of sampled cells in demo mode (default: ``500``)
 
-See ``luca.yaml`` and ``pbmc.yaml`` for examples. 
+See ``configs/data/luca.yaml`` and ``configs/data/pbmc.yaml`` for examples.
 Optionally, use ``utils`` for custom preprocessing and postprocessing.
 
 Run
@@ -82,13 +83,13 @@ From ``experiments/preprocessing``, run:
 
 .. code-block:: bash
 
-   python prepare_dataset.py --config-name mydata
+   python prepare_dataset.py --config-name data/mydata
 
 Override individual settings with CLI:
 
 .. code-block:: bash
 
-   python prepare_dataset.py --config-name mydata \
+   python prepare_dataset.py --config-name data/mydata \
      input=/path/to/input_new.h5ad \
      output=/path/to/mydata_new
 
@@ -96,7 +97,7 @@ Run a demo with the usage of a new output directory:
 
 .. code-block:: bash
 
-   python prepare_dataset.py --config-name mydata \
+   python prepare_dataset.py --config-name data/mydata \
      demo=true \
      demo_cells=500 \
      split.strategy=combination \
