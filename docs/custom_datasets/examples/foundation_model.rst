@@ -12,11 +12,6 @@ How to run
 ----------
 
 Run from the repository root. Containers use the same paths as **Direct**.
-The data mounts below assume ``data`` is a symlink to an absolute path outside
-the repository. Omit that mount when ``data`` is a regular repository folder.
-
-Temporary files use ``results/luca-demo/tmp``. The container runtime also places
-its default Numba and Matplotlib caches under that directory.
 
 .. tab-set::
 
@@ -105,6 +100,9 @@ its default Numba and Matplotlib caches under that directory.
              /path/to/reconeval-all.sif \
              conda run --no-capture-output -n <reconeval-state | reconeval> [PYTHON COMMAND]
 
+      - Temporary files use ``results/luca-demo/tmp``
+      - ``data`` is a symlink here; omit the extra mount if it is a regular folder
+
       Replace:
 
       - ``<reconeval-state | reconeval>`` with ``reconeval-state`` for SE embedding
@@ -127,6 +125,9 @@ its default Numba and Matplotlib caches under that directory.
              -w /work \
              reconeval:latest \
              -n <reconeval-state | reconeval> [PYTHON COMMAND]
+
+      - Temporary files use ``results/luca-demo/tmp``
+      - ``data`` is a symlink here; omit the extra mount if it is a regular folder
 
       Replace:
 
@@ -345,13 +346,13 @@ Reuse the reference PCA if available, or follow the
 4. Evaluate
 -----------
 
-Reconstruct held-out expression and compute R², MSE, MMD, and energy distance.
+Reconstruct held-out expression and compute distributional metrics.
 
 .. tab-set::
 
    .. tab-item:: Direct
 
-      Set ``<checkpoint>`` to your decoder checkpoint filename, without ``.ckpt``.
+      Set ``<checkpoint>`` to your decoder checkpoint filename:
 
       **Distributional metrics**
 
@@ -365,7 +366,7 @@ Reconstruct held-out expression and compute R², MSE, MMD, and energy distance.
              pretrained=SE \
              decoder=MLP \
              metric=decode_statistical_demo \
-             "decoder.load.path='results/luca-demo/fm/SE/MLP/<checkpoint>.ckpt'" \
+             "decoder.load.path='results/luca-demo/fm/SE/MLP/<checkpoint>'" \
              'metric.projector.load.path=[results/luca-demo/reference-pca/mean.zarr,results/luca-demo/reference-pca/pc_50.zarr]' \
              output.save_path=results/luca-demo/fm/SE/distributional.csv
 
