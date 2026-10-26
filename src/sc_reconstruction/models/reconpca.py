@@ -2,6 +2,7 @@ from typing import Any, Dict
 import numpy as np
 import zarr
 import os
+import tempfile
 import anndata as ad
 from sc_reconstruction.dataloaders.datamodules import DaskPCADataModule
 from sc_reconstruction.models._base_model import BaseReconstructionModel
@@ -36,9 +37,12 @@ class ReconPCA(BaseReconstructionModel):
     
     def _setup_cluster(self,
                       gpu_ids: str = "0",
-                      temp_dir: str = "/lustre/groups/ml01/workspace/xiaotong.fu/reconstruction/temp"):
+                      temp_dir: str | None = None):
         from dask_cuda import LocalCUDACluster
         from dask.distributed import Client
+        if temp_dir is None:
+            temp_dir = tempfile.gettempdir()
+        os.makedirs(temp_dir, exist_ok=True)
         self.cluster = LocalCUDACluster(
             local_directory=temp_dir,
             CUDA_VISIBLE_DEVICES=gpu_ids
@@ -70,16 +74,19 @@ class ReconPCA(BaseReconstructionModel):
              gpu_ids: str = "0",
              save_mean: bool = True,
              save_path: str = None,
+             temp_dir: str | None = None,
              **kwargs) -> None:
         '''
         Train PCA model
         adata: ad.AnnData - X: dask array of csr matrix
         gpu_ids: str - The GPU IDs to use
         save_mean: bool - Whether to save the mean
+        temp_dir: str | None - Directory for Dask temporary files; defaults to
+            the system temporary directory.
         '''
         import rapids_singlecell as rsc
         import anndata as ad
-        self._setup_cluster(gpu_ids)
+        self._setup_cluster(gpu_ids, temp_dir=temp_dir)
         print("set up cluster")
         datamodule.prepare_data()
         adata = datamodule.train_dataloader()

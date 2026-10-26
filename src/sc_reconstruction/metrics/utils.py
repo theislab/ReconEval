@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import pairwise_distances, r2_score
+from sklearn.metrics import pairwise_distances, mean_squared_error, r2_score
 from sklearn.metrics.pairwise import rbf_kernel, polynomial_kernel
 import ot
 from scipy.stats import spearmanr, pearsonr
