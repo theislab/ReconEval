@@ -1,0 +1,34 @@
+# @package _global_
+
+input: ???
+output: ???             # dataset directory; expression.zarr and split stores are written here
+
+hvg:
+  method: n_top_genes   # n_top_genes | dispersion | precomputed
+  column: null          # used when method: precomputed
+  n_top_genes: null     # used when method: n_top_genes
+  min_mean: null        # used when method: dispersion
+  max_mean: null        # used when method: dispersion
+  min_disp: null        # used when method: dispersion
+
+layer: null
+normalize: true
+log1p: true
+split:
+  strategy: ???         # read | combination | category
+  path: null            # path to split_metadata.zarr (strategy: existing)
+  column: null          # column name to split by (strategy: category)
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+var_names_col: null     # null falls back to adata.var_names; set to e.g. 'feature_name' for luca
+columns:
+  - ???
+  - ???
+  - ???
+seed: 42
+utils: null
+
+demo: false
+demo_cells: 500
+demo_genes: null
