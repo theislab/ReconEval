@@ -1,0 +1,12 @@
+# Copy to mydata_val.toml and set the directory containing val.h5ad.
+# Use the same dataset label in [datasets] and [training].
+[datasets]
+mydata = "/path/to/mydata/val/"
+
+# Keep "train": train_st.py uses this module's training loader for validation.
+[training]
+mydata = "train"
+
+[zeroshot]
+
+[fewshot]

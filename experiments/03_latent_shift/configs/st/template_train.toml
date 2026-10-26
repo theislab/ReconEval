@@ -1,0 +1,11 @@
+# Copy to mydata_train.toml and set the directory containing train.h5ad.
+# Use the same dataset label in [datasets] and [training].
+[datasets]
+mydata = "/path/to/mydata/train/"
+
+[training]
+mydata = "train"
+
+[zeroshot]
+
+[fewshot]

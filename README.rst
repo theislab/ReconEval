@@ -172,6 +172,16 @@ Data availability
 
 Update: Model weights uploaded
 
+Use custom data
+===============
+
+See the `custom-data guide <docs/custom_datasets.rst>`_ for separate
+instructions matching ``01_end_to_end``, ``02_foundation_model``, and
+``03_latent_shift``. It covers preprocessed data layouts, environment setup,
+CLI arguments, SLURM submission, and reconstruction and evaluation tutorials.
+For end-to-end training, copy the dataset template to ``mydata.yaml`` and select
+``data=mydata``, with settings saved in YAML or overridden on the command line.
+
 Paper
 =====
 

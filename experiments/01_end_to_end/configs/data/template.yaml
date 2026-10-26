@@ -1,0 +1,50 @@
+# Custom dataset template for end-to-end training.
+# Use this template as a starting reference: copy it to mydata.yaml.
+# Fill in these fields in the copy or supply them through Hydra overrides.
+# Select your copied configuration with data=mydata in either case.
+name: ???
+path: ???  # Directory containing the preprocessed train/val/test splits.
+input_dim: ???  # Number of genes, in the same order across all splits.
+
+model_specific:
+  # PCA reads a training H5AD instead of the Zarr splits used below.
+  PCA:
+    _target_: sc_reconstruction.dataloaders.datamodules.DaskPCADataModule
+    train_path: ${data.path}/train.h5ad
+    chunk_size: 10_000
+  AE:
+    _target_: sc_reconstruction.dataloaders.datamodules.IterDaskDataModule
+    train_path: ${data.path}/train.zarr
+    val_path: ${data.path}/val.zarr
+    test_path: ${data.path}/test.zarr
+    chunk_size: 10_000
+    num_workers: 0
+    chunks_per_worker: 5
+    minibatch_size: 256
+  scVI:
+    _target_: sc_reconstruction.dataloaders.datamodules.IterDaskDataModule
+    train_path: ${data.path}/train.zarr
+    val_path: ${data.path}/val.zarr
+    test_path: ${data.path}/test.zarr
+    chunk_size: 10_000
+    num_workers: 0
+    chunks_per_worker: 5
+    minibatch_size: 256
+  nlscVI:
+    _target_: sc_reconstruction.dataloaders.datamodules.IterDaskDataModule
+    train_path: ${data.path}/train.zarr
+    val_path: ${data.path}/val.zarr
+    test_path: ${data.path}/test.zarr
+    chunk_size: 10_000
+    num_workers: 0
+    chunks_per_worker: 5
+    minibatch_size: 256
+  mlscVI:
+    _target_: sc_reconstruction.dataloaders.datamodules.IterDaskDataModule
+    train_path: ${data.path}/train.zarr
+    val_path: ${data.path}/val.zarr
+    test_path: ${data.path}/test.zarr
+    chunk_size: 10_000
+    num_workers: 0
+    chunks_per_worker: 5
+    minibatch_size: 256
