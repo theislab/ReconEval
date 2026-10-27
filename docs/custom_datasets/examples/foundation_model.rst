@@ -65,7 +65,9 @@ Run from the repository root. Containers use the same paths as **Direct**.
          mkdir -p logs
          sbatch [SLURM SCRIPT]
 
-      .. dropdown:: Placeholder info:
+      .. dropdown:: Note: Placeholder info
+         :icon: info
+         :color: info
 
          - ``[SLURM HEADERS]``: Slurm job settings under ``#SBATCH``
          - ``[PATHS AND APPTAINER SETUP]``: define the required paths and environment settings

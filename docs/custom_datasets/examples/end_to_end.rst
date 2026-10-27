@@ -60,7 +60,9 @@ Run from the repository root. Containers use the same paths as **Direct**.
          mkdir -p logs
          sbatch [SLURM SCRIPT]
 
-      .. dropdown:: Placeholder info:
+      .. dropdown:: Note: Placeholder info
+         :icon: info
+         :color: info
          
          - ``[SLURM HEADERS]``: Slurm job specified with ``#SBATCH``
          - ``[PATHS AND APPTAINER SETUP]``: define the required paths and environment settings
@@ -432,7 +434,7 @@ mlAE, and nlscVI at latent dimensions 10, 32, and 128.
 For configuration details see :doc:`Evaluate <../end_to_end/evaluate>`.
 
 
-1. Plot distributional metrics
+4. Plot distributional metrics
 ------------------------------
 
 After evaluation, plot the four metrics against latent dimension for PCA, mlAE,
@@ -492,7 +494,7 @@ Model performance may be limited by the small demo split.
    is the mean over held-out combinations.
 
 
-1. Extract embeddings (optional)
+5. Extract embeddings (optional)
 --------------------------------------
 
 Extract latent representations from trained models for downstream tasks
