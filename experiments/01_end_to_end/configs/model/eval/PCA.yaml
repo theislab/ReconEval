@@ -1,0 +1,17 @@
+# Evaluation configuration for PCA.
+# Override model.load.model_name to pc_N and
+# model.model_args.n_components to N, where N is the number of components.
+# Set model.load.path to [mean.zarr, pc_N.zarr].
+
+meta:
+  name: PCA
+
+model_args:
+  _target_: sc_reconstruction.models.reconpca.ReconPCA
+  n_components: 300
+
+load:
+  model_name: pc_300
+  path:
+    - ???
+    - ???

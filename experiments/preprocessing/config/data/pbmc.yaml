@@ -1,0 +1,28 @@
+# @package _global_
+defaults:
+  - /base
+  - _self_
+
+input: /lustre/groups/ml01/workspace/ten_million/data/final_data/adata_notebook_input.h5ad
+output: /lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/pbmc_wg
+hvg:
+  method: dispersion
+  min_mean: 0.0125
+  max_mean: 3
+  min_disp: 0.25
+
+layer: null
+normalize: true
+log1p: true
+split:
+  strategy: category
+  column: cell_type_new
+var_names_col: null
+columns:
+  - cell_type_new
+  - donor
+  - cytokine
+seed: 33
+
+cell_type_csv: /lustre/groups/ml01/workspace/ten_million/data/data_2024_12_16/new_cell_type_annotations.csv
+utils: utils/pbmc.py

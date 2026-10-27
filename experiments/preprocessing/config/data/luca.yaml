@@ -1,0 +1,23 @@
+# @package _global_
+defaults:
+  - /base
+  - _self_
+
+input: /lustre/groups/ml01/workspace/olga.novitskaia/reconeval_data/luca/core_250130.h5ad
+output: /lustre/groups/ml01/workspace/olga.novitskaia/reconeval_data/luca
+hvg:
+  method: precomputed
+  column: is_highly_variable
+
+layer: count
+normalize: true
+log1p: true
+split:
+  strategy: read
+  path: /lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/lucav2/split03/split_metadata.zarr
+var_names_col: feature_name
+columns:
+  - cell_type
+  - dataset
+  - origin
+utils: utils/luca.py
