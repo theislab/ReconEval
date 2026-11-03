@@ -1,0 +1,5 @@
+torch==2.1.2
+torchtext==0.16.2
+torchdata==0.7.1
+numpy==1.26.4
+ipython==8.37.0
