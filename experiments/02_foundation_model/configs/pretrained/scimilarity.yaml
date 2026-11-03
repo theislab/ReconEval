@@ -5,6 +5,7 @@ meta:
 model_args:
   _target_: sc_reconstruction.models.reconscimilarity.ReconPretrainedscimilarity 
   checkpoint_path: /lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/sup/scimilarity/model_v1.1
+  gene_overlap_threshold: 5000
 
 data_args:
   split_meta_root: "/lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/pbmc_w_ag/comb_w_obs.zarr"
@@ -17,4 +18,3 @@ data_args:
 
 parts: 1
 total_parts: 15
- 
