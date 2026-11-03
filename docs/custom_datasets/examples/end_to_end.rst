@@ -126,76 +126,77 @@ Run from the repository root. Containers use the same paths as **Direct**.
       - ``[PYTHON COMMAND]`` with the full command from the **Direct** tab of the relevant step
       - ``reconeval:latest`` with the name and tag of your Docker image
 
-.. dropdown:: In a nutshell: the full pipeline from **Direct** tabs
-   :icon: info
-   :color: info
+In a nutshell
+-------------
 
-   .. code-block:: bash
+The full pipeline from **Direct** tabs:
 
-      # 0. Activate environment
-      conda activate reconeval
+.. code-block:: bash
 
-      # Prerequisites: Prepare dataset
-      python experiments/preprocessing/prepare_dataset.py \
-          --config-name data/luca \
-          utils=experiments/preprocessing/utils/luca.py \
-          input=data/luca/core_250130.h5ad \
-          output=data/luca/demo \
-          demo=true \
-          demo_cells=500 \
-          demo_genes=500 \
-          seed=42 \
-          split.strategy=combination \
-          split.path=null
+   # 0. Activate environment
+   conda activate reconeval
 
-      # Prerequisites: Convert expression store to .h5ad
-      python experiments/preprocessing/zarr_to_h5ad.py \
-          "$(realpath data)/luca/demo/expression.zarr"
+   # Prerequisites: Prepare dataset
+   python experiments/preprocessing/prepare_dataset.py \
+       --config-name data/luca \
+       utils=experiments/preprocessing/utils/luca.py \
+       input=data/luca/core_250130.h5ad \
+       output=data/luca/demo \
+       demo=true \
+       demo_cells=500 \
+       demo_genes=500 \
+       seed=42 \
+       split.strategy=combination \
+       split.path=null
 
-      # 1. Train (example: mlAE, latent dim 10)
-      python experiments/01_end_to_end/codes/train.py \
-          --config-dir custom_datasets_demo/01_end_to_end/configs \
-          data=custom_luca_demo \
-          model=train/AE \
-          trainer=AE \
-          model.meta.name=mlAE \
-          model.model_args.library_size_mode=modeled \
-          'model.model_args.n_hidden=[1024]' \
-          model.model_args.n_latent=10 \
-          'weights.dir=results/luca-demo/mlAE/10'
+   # Prerequisites: Convert expression store to .h5ad
+   python experiments/preprocessing/zarr_to_h5ad.py \
+       "$(realpath data)/luca/demo/expression.zarr"
 
-      # 2. Reference PCA
-      python experiments/01_end_to_end/codes/train.py \
-          --config-dir custom_datasets_demo/01_end_to_end/configs \
-          data=custom_luca_demo \
-          model=train/PCA \
-          trainer=PCA \
-          'trainer.temp_dir=${weights.dir}/pca-work' \
-          model.model_args.n_components=50 \
-          weights.dir=results/luca-demo/reference-pca
+   # 1. Train (example: mlAE, latent dim 10)
+   python experiments/01_end_to_end/codes/train.py \
+       --config-dir custom_datasets_demo/01_end_to_end/configs \
+       data=custom_luca_demo \
+       model=train/AE \
+       trainer=AE \
+       model.meta.name=mlAE \
+       model.model_args.library_size_mode=modeled \
+       'model.model_args.n_hidden=[1024]' \
+       model.model_args.n_latent=10 \
+       'weights.dir=results/luca-demo/mlAE/10'
 
-      # 3. Evaluate (distributional metrics, mlAE latent dim 10)
-      python experiments/01_end_to_end/codes/eval_distributional.py \
-          --config-dir custom_datasets_demo/01_end_to_end/configs \
-          --config-name base_eval_demo \
-          model=eval/AE \
-          model.meta.name=mlAE \
-          metric=_distributional \
-          'metric.projector.load.path=[results/luca-demo/reference-pca/mean.zarr,results/luca-demo/reference-pca/pc_50.zarr]' \
-          "model.load.path='results/luca-demo/mlAE/10/<run>/<checkpoint>'" \
-          "model.load.model_name='<run>'" \
-          output.save_path=results/luca-demo/mlAE/10/distributional.csv
+   # 2. Reference PCA
+   python experiments/01_end_to_end/codes/train.py \
+       --config-dir custom_datasets_demo/01_end_to_end/configs \
+       data=custom_luca_demo \
+       model=train/PCA \
+       trainer=PCA \
+       'trainer.temp_dir=${weights.dir}/pca-work' \
+       model.model_args.n_components=50 \
+       weights.dir=results/luca-demo/reference-pca
 
-      # 4. Plot distributional metrics
-      python custom_datasets_demo/01_end_to_end/codes/plot_metrics.py \
-          --results-dir results/luca-demo
+   # 3. Evaluate (distributional metrics, mlAE latent dim 10)
+   python experiments/01_end_to_end/codes/eval_distributional.py \
+       --config-dir custom_datasets_demo/01_end_to_end/configs \
+       --config-name base_eval_demo \
+       model=eval/AE \
+       model.meta.name=mlAE \
+       metric=_distributional \
+       'metric.projector.load.path=[results/luca-demo/reference-pca/mean.zarr,results/luca-demo/reference-pca/pc_50.zarr]' \
+       "model.load.path='results/luca-demo/mlAE/10/<run>/<checkpoint>'" \
+       "model.load.model_name='<run>'" \
+       output.save_path=results/luca-demo/mlAE/10/distributional.csv
 
-      # 5. (Optional) Extract embeddings
-      python experiments/01_end_to_end/codes/extract_e2e_embeddings.py \
-          --hvg_zarr data/luca/demo/expression.zarr \
-          --model AE \
-          --ckpt "results/luca-demo/mlAE/10/<run>/<checkpoint>" \
-          --out results/luca-demo/embeddings/mlAE/10.zarr
+   # 4. Plot distributional metrics
+   python custom_datasets_demo/01_end_to_end/codes/plot_metrics.py \
+       --results-dir results/luca-demo
+
+   # 5. (Optional) Extract embeddings
+   python experiments/01_end_to_end/codes/extract_e2e_embeddings.py \
+       --hvg_zarr data/luca/demo/expression.zarr \
+       --model AE \
+       --ckpt "results/luca-demo/mlAE/10/<run>/<checkpoint>" \
+       --out results/luca-demo/embeddings/mlAE/10.zarr
 
 .. _end-to-end-prerequisites:
 
