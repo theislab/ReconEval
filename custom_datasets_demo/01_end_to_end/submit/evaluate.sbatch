@@ -87,7 +87,6 @@ apptainer exec --cleanenv \
     --bind "$PWD:/work" \
     --bind "$(realpath results):$(realpath results)" \
     --bind "$(realpath data):$(readlink data)" \
-    --bind "$(realpath ~/.cache):$(readlink ~/.cache)" \
     --pwd /work \
     "$image" \
     conda run --no-capture-output -n reconeval \
