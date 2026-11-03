@@ -17,7 +17,7 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/41522356/reconeval-all.sif}
+image=/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif
 data_dir=$(realpath data)
 
 # ---------------------------------------------------------------------------
@@ -42,7 +42,8 @@ mkdir -p results/luca-demo/tmp
 apptainer exec --cleanenv \
     --env TMPDIR=/work/results/luca-demo/tmp \
     --bind "$PWD:/work" \
-    --bind "$data_dir:$data_dir" \
+    --bind "$(realpath results):$(realpath results)" \
+    --bind "$data_dir:$(readlink data)" \
     --pwd /work \
     "$image" \
     conda run --no-capture-output -n reconeval \

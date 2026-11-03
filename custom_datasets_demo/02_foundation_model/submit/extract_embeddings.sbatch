@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Submit from the repository root:
+# Submit from the repository root after download_checkpoints.sbatch completes:
 # mkdir -p logs
 # sbatch custom_datasets_demo/02_foundation_model/submit/extract_embeddings.sbatch
 # Embed all demo groups with SE, scGPT, scConcept, and SCimilarity.
 #SBATCH --job-name=luca-demo-fm-emb
 #SBATCH --partition=gpu_p
 #SBATCH --qos=gpu_normal
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:h100:1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
+#SBATCH --mem=128G
 #SBATCH --time=04:00:00
 #SBATCH --output=logs/luca-demo-fm-emb-%j.out
 
@@ -18,11 +18,11 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/41522356/reconeval-all.sif}
+image=/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif
 data_dir=$(realpath data)
-model_dir=/lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/sup
+pretrained_dir=$(realpath checkpoints/pretrained)
 mkdir -p data/luca/demo/embeddings/{SE,scGPT,scConcept,scimilarity}
-mkdir -p results/luca-demo/fm/scConcept/cache
+mkdir -p checkpoints/pretrained/scConcept/Corpus-30M/cache
 
 export APPTAINERENV_CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES"
 
@@ -48,6 +48,8 @@ PY
 ## SE
 conda run --no-capture-output -n reconeval-state \
     python -u experiments/02_foundation_model/codes/SE_emb.py \
+        model_args.checkpoint_path=checkpoints/pretrained/SE/se600m_epoch16.ckpt \
+        model_args.protein_embeds_path=checkpoints/pretrained/SE/protein_embeddings.pt \
         data_args.comb_meta_root=data/luca/demo/expression.zarr \
         data_args.split_meta_root=data/luca/demo/split_metadata.zarr \
         data_args.target_key=null \
@@ -58,6 +60,7 @@ conda run --no-capture-output -n reconeval-state \
 ## scGPT
 conda run --no-capture-output -n reconeval-scgpt \
     python -u experiments/02_foundation_model/codes/scGPT_emb.py \
+        model_args.checkpoint_path=checkpoints/pretrained/scGPT \
         data_args.comb_meta_root=data/luca/demo/expression.zarr \
         data_args.split_meta_root=data/luca/demo/split_metadata.zarr \
         data_args.target_key=null \
@@ -71,6 +74,7 @@ conda run --no-capture-output -n reconeval-scgpt \
 ## scConcept
 conda run --no-capture-output -n reconeval-scconcept \
     python -u experiments/02_foundation_model/codes/scConcept_emb.py \
+        model_args.checkpoint_path=checkpoints/pretrained/scConcept/Corpus-30M \
         data_args.comb_meta_root=data/luca/demo/expression.zarr \
         data_args.split_meta_root=data/luca/demo/split_metadata.zarr \
         data_args.target_key=null \
@@ -83,6 +87,8 @@ conda run --no-capture-output -n reconeval-scconcept \
 ## scimilarity
 conda run --no-capture-output -n reconeval-scimilarity \
     python -u experiments/02_foundation_model/codes/scimilarity_emb.py \
+        model_args.checkpoint_path=checkpoints/pretrained/scimilarity/model_v1.1 \
+        model_args.gene_overlap_threshold=400 \
         data_args.comb_meta_root=data/luca/demo/expression.zarr \
         data_args.split_meta_root=data/luca/demo/split_metadata.zarr \
         data_args.target_key=null \
@@ -96,15 +102,15 @@ COMMAND
 )
 
 # ---------------------------------------------------------------------------
-# Run — mount the repository, external data, model files, and scConcept cache
+# Run — mount the repository (including checkpoints) and external data
 # ---------------------------------------------------------------------------
 mkdir -p results/luca-demo/tmp
 apptainer exec --cleanenv --nv \
     --env TMPDIR=/work/results/luca-demo/tmp \
     --bind "$PWD:/work" \
-    --bind "$data_dir:$data_dir" \
-    --bind "$model_dir:$model_dir:ro" \
-    --bind "$PWD/results/luca-demo/fm/scConcept/cache:$model_dir/scconcept/Corpus-30M/cache" \
+    --bind "$(realpath results):$(realpath results)" \
+    --bind "$pretrained_dir:$(readlink checkpoints/pretrained)" \
+    --bind "$data_dir:$(readlink data)" \
     --pwd /work \
     "$image" \
     bash -e -c "$CMD"

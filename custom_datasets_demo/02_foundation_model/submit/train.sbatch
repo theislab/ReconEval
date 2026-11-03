@@ -18,7 +18,7 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/41522356/reconeval-all.sif}
+image=/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif
 data_dir=$(realpath data)
 
 export APPTAINERENV_CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES"
@@ -35,7 +35,8 @@ for model in SE scGPT scConcept scimilarity; do
         --all-genes-zarr data/luca/demo/expression.zarr \
         --target-genes-zarr data/luca/demo/expression.zarr \
         --embedding-key "$model" \
-        --num-workers 8 \
+        --num-workers 0 \
+        --batch-size 32 \
         --out "results/luca-demo/fm/$model/MLP"
 done
 COMMAND
@@ -48,7 +49,8 @@ mkdir -p results/luca-demo/tmp
 apptainer exec --cleanenv --nv \
     --env TMPDIR=/work/results/luca-demo/tmp \
     --bind "$PWD:/work" \
-    --bind "$data_dir:$data_dir" \
+    --bind "$(realpath results):$(realpath results)" \
+    --bind "$data_dir:$(readlink data)" \
     --pwd /work \
     "$image" \
     conda run --no-capture-output -n reconeval \

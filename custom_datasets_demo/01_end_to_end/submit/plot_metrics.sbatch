@@ -11,11 +11,12 @@
 
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR:?}"
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/41522356/reconeval-all.sif}
+image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif}
 mkdir -p results/luca-demo/tmp
 apptainer exec --cleanenv \
     --env TMPDIR=/work/results/luca-demo/tmp \
     --bind "$PWD:/work" \
+    --bind "$(realpath results):$(realpath results)" \
     --pwd /work \
     "$image" \
     conda run --no-capture-output -n reconeval \
