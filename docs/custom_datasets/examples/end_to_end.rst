@@ -71,6 +71,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
          - ``[APPTAINER OPTIONS]``:
 
            - ``--bind "$PWD:/work"``: mount the repository at ``/work``
+           - ``--bind "$(realpath results):$(realpath results)"``: mount the canonical results target
            - ``--bind "$(realpath data):$(readlink data)"``: mount the target of the external data symlink
            - ``--pwd /work``: set the working directory
            - ``--nv``: enable NVIDIA GPU access
@@ -87,6 +88,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
          apptainer exec --cleanenv --nv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(readlink data)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
@@ -94,6 +96,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
 
       - Temporary files use ``results/luca-demo/tmp``
       - ``data`` is a symlink here; omit the extra mount if it is a regular folder
+      - ``results`` is a symlink here; omit the extra mount if it is a regular folder
 
       Replace:
 
@@ -108,6 +111,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
          docker run --rm --gpus all \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(readlink data)" \
              -w /work \
              reconeval:latest \
@@ -115,11 +119,83 @@ Run from the repository root. Containers use the same paths as **Direct**.
 
       - Temporary files use ``results/luca-demo/tmp``
       - ``data`` is a symlink here; omit the extra mount if it is a regular folder
+      - ``results`` is a symlink here; omit the extra mount if it is a regular folder
 
       Replace:
        
       - ``[PYTHON COMMAND]`` with the full command from the **Direct** tab of the relevant step
       - ``reconeval:latest`` with the name and tag of your Docker image
+
+.. dropdown:: In a nutshell: the full pipeline from **Direct** tabs
+   :icon: info
+   :color: info
+
+   .. code-block:: bash
+
+      # 0. Activate environment
+      conda activate reconeval
+
+      # Prerequisites: Prepare dataset
+      python experiments/preprocessing/prepare_dataset.py \
+          --config-name data/luca \
+          utils=experiments/preprocessing/utils/luca.py \
+          input=data/luca/core_250130.h5ad \
+          output=data/luca/demo \
+          demo=true \
+          demo_cells=500 \
+          demo_genes=500 \
+          seed=42 \
+          split.strategy=combination \
+          split.path=null
+
+      # Prerequisites: Convert expression store to .h5ad
+      python experiments/preprocessing/zarr_to_h5ad.py \
+          "$(realpath data)/luca/demo/expression.zarr"
+
+      # 1. Train (example: mlAE, latent dim 10)
+      python experiments/01_end_to_end/codes/train.py \
+          --config-dir custom_datasets_demo/01_end_to_end/configs \
+          data=custom_luca_demo \
+          model=train/AE \
+          trainer=AE \
+          model.meta.name=mlAE \
+          model.model_args.library_size_mode=modeled \
+          'model.model_args.n_hidden=[1024]' \
+          model.model_args.n_latent=10 \
+          'weights.dir=results/luca-demo/mlAE/10'
+
+      # 2. Reference PCA
+      python experiments/01_end_to_end/codes/train.py \
+          --config-dir custom_datasets_demo/01_end_to_end/configs \
+          data=custom_luca_demo \
+          model=train/PCA \
+          trainer=PCA \
+          'trainer.temp_dir=${weights.dir}/pca-work' \
+          model.model_args.n_components=50 \
+          weights.dir=results/luca-demo/reference-pca
+
+      # 3. Evaluate (distributional metrics, mlAE latent dim 10)
+      python experiments/01_end_to_end/codes/eval_distributional.py \
+          --config-dir custom_datasets_demo/01_end_to_end/configs \
+          --config-name base_eval_demo \
+          model=eval/AE \
+          model.meta.name=mlAE \
+          metric=_distributional \
+          'metric.projector.load.path=[results/luca-demo/reference-pca/mean.zarr,results/luca-demo/reference-pca/pc_50.zarr]' \
+          "model.load.path='results/luca-demo/mlAE/10/<run>/<checkpoint>'" \
+          "model.load.model_name='<run>'" \
+          output.save_path=results/luca-demo/mlAE/10/distributional.csv
+
+      # 4. Plot distributional metrics
+      python custom_datasets_demo/01_end_to_end/codes/plot_metrics.py \
+          --results-dir results/luca-demo
+
+      # 5. (Optional) Extract embeddings
+      python experiments/01_end_to_end/codes/extract_e2e_embeddings.py \
+          --hvg_zarr data/luca/demo/expression.zarr \
+          --model AE \
+          --ckpt "results/luca-demo/mlAE/10/<run>/<checkpoint>" \
+          --out results/luca-demo/embeddings/mlAE/10.zarr
 
 .. _end-to-end-prerequisites:
 
@@ -164,6 +240,7 @@ The commands below prepare the LuCA demo and save the output to ``data/luca/demo
          apptainer exec --cleanenv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(readlink data)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
@@ -177,6 +254,7 @@ The commands below prepare the LuCA demo and save the output to ``data/luca/demo
          docker run --rm \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(readlink data)" \
              -w /work \
              reconeval:latest \
@@ -213,6 +291,7 @@ Convert ``expression.zarr`` to ``expression.h5ad`` for reference PCA:
          apptainer exec --cleanenv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(realpath data)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
@@ -226,6 +305,7 @@ Convert ``expression.zarr`` to ``expression.h5ad`` for reference PCA:
          docker run --rm \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(realpath data)" \
              -w /work \
              reconeval:latest \
@@ -259,7 +339,9 @@ The ``[PYTHON COMMAND]`` example below shows one model; the Slurm script sweeps 
 
    .. tab-item:: Slurm
 
-      The script sweeps **PCA**, **mlAE**, and **nlscVI** at latent dims 10, 32, and 128:
+      The script submits nine array tasks: **PCA**, **mlAE**, and **nlscVI**
+      at latent dims 10, 32, and 128. Each task requests one GPU and can run
+      in parallel as cluster resources become available:
 
       .. code-block:: bash
 
@@ -274,6 +356,7 @@ The ``[PYTHON COMMAND]`` example below shows one model; the Slurm script sweeps 
          apptainer exec --cleanenv --nv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(readlink data)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
@@ -287,6 +370,7 @@ The ``[PYTHON COMMAND]`` example below shows one model; the Slurm script sweeps 
          docker run --rm --gpus all \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(readlink data)" \
              -w /work \
              reconeval:latest \
@@ -341,6 +425,7 @@ Temporary files are stored in ``pca-work`` under ``weights.dir``.
          apptainer exec --cleanenv --nv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(readlink data)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
@@ -354,6 +439,7 @@ Temporary files are stored in ``pca-work`` under ``weights.dir``.
          docker run --rm --gpus all \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(readlink data)" \
              -w /work \
              reconeval:latest \
@@ -411,6 +497,7 @@ mlAE, and nlscVI at latent dimensions 10, 32, and 128.
          apptainer exec --cleanenv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(readlink data)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
@@ -424,6 +511,7 @@ mlAE, and nlscVI at latent dimensions 10, 32, and 128.
          docker run --rm \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(readlink data)" \
              -w /work \
              reconeval:latest \
@@ -466,6 +554,7 @@ and nlscVI:
          apptainer exec --cleanenv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
              conda run --no-capture-output -n reconeval [PYTHON COMMAND]
@@ -478,20 +567,20 @@ and nlscVI:
          docker run --rm \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -w /work \
              reconeval:latest \
              -n reconeval [PYTHON COMMAND]
 
 **Output:** ``results/luca-demo/plots/scaling_latent_distributional.svg``.
 
-The figure compares model performance across latent dimensions on the small demo split.
-Model performance may be limited by the small demo split.
+For reference, the figure below shows models trained on the full LuCA dataset.
 
 .. figure:: /_static/demo/luca_distributional.svg
    :width: 100%
 
-   Distributional metrics from the 500-cell, 500-gene LuCA demo. Each point
-   is the mean over held-out combinations.
+   Full LuCA test metrics: unweighted means over 155 held-out combinations.
+   ``(rev)`` marks negated metrics; higher is better.
 
 
 5. Extract embeddings (optional)
@@ -535,6 +624,7 @@ Use the same checkpoint file as in evaluation.
          apptainer exec --cleanenv --nv \
              --env TMPDIR=/work/results/luca-demo/tmp \
              --bind "$PWD:/work" \
+             --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(readlink data)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
@@ -548,6 +638,7 @@ Use the same checkpoint file as in evaluation.
          docker run --rm --gpus all \
              -e TMPDIR=/work/results/luca-demo/tmp \
              -v "$PWD:/work" \
+             -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(readlink data)" \
              -w /work \
              reconeval:latest \
