@@ -133,10 +133,10 @@ The full pipeline from **Direct** tabs:
 
 .. code-block:: bash
 
-   # 0. Activate environment
+   # Activate environment
    conda activate reconeval
 
-   # Prerequisites: Prepare dataset
+   # 0. Prerequisites: Prepare dataset
    python experiments/preprocessing/prepare_dataset.py \
        --config-name data/luca \
        utils=experiments/preprocessing/utils/luca.py \
@@ -149,7 +149,7 @@ The full pipeline from **Direct** tabs:
        split.strategy=combination \
        split.path=null
 
-   # Prerequisites: Convert expression store to .h5ad
+   # 0. Prerequisites: Convert expression store to .h5ad
    python experiments/preprocessing/zarr_to_h5ad.py \
        "$(realpath data)/luca/demo/expression.zarr"
 
@@ -200,8 +200,8 @@ The full pipeline from **Direct** tabs:
 
 .. _end-to-end-prerequisites:
 
-Prerequisites
--------------
+0. Prerequisites
+----------------
 
 **Prepare the dataset**
 

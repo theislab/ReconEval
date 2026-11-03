@@ -223,7 +223,7 @@ Reuse ``data/luca/demo/`` if those steps are already complete.
 1. Prepare checkpoints
 ----------------------
 
-Download SE, scGPT, scConcept, and SCimilarity into ``checkpoints/pretrained``:
+Download SE, scGPT, scConcept, and SCimilarity checkpoints:
 
 .. tab-set::
 
@@ -270,6 +270,9 @@ Download SE, scGPT, scConcept, and SCimilarity into ``checkpoints/pretrained``:
              python experiments/02_foundation_model/codes/download_checkpoints.py \
                  --model all \
                  --output-dir checkpoints/pretrained
+
+
+**Outputs:** pretrained checkpoints in ``checkpoints/pretrained/``
 
 
 2. Prepare embeddings
@@ -542,8 +545,7 @@ Reconstruct held-out expression and compute distributional metrics.
              reconeval:latest \
              -n reconeval [PYTHON COMMAND]
 
-**Outputs:** ``results/luca-demo/fm/SE/distributional.csv`` for the **Direct**
-example, or ``results/luca-demo/fm/<model>/distributional.csv`` for the Slurm sweep.
+**Outputs:** ``results/luca-demo/fm/<model>/distributional.csv``
 
 For configuration details see :doc:`Evaluate <../foundation_model/evaluate>`.
 
@@ -587,6 +589,8 @@ After evaluating all four models:
              -w /work \
              reconeval:latest \
              -n reconeval [PYTHON COMMAND]
+
+**Outputs:** ``results/luca-demo/fm/summary.csv``
 
 Means across test groups. Higher R² and lower other metrics are better.
 
