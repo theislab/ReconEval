@@ -48,6 +48,7 @@ class ReconPretrainedscimilarity():
         self,
         checkpoint_path: str, 
         emb_key: str = 'X_scimilarity',
+        gene_overlap_threshold: int = 5000,
         **kwargs
     ):
         """Pre-trained SCimilarity foundation model wrapper.
@@ -59,14 +60,17 @@ class ReconPretrainedscimilarity():
         Args:
             checkpoint_path: Path to the pre-trained model checkpoint
                 (config, model weights, gene mapping).
+            gene_overlap_threshold: Minimum number of genes shared with the model.
         """
         self.model_params = {
             'checkpoint_path': checkpoint_path,
             'emb_key': emb_key,
+            'gene_overlap_threshold': gene_overlap_threshold,
         }
 
         self.inferer = self._load_pretrained_model(checkpoint_path)
         self.emb_key = emb_key
+        self.gene_overlap_threshold = gene_overlap_threshold
         self.genes = None
         self.overlap_genes = None
 
@@ -93,7 +97,11 @@ class ReconPretrainedscimilarity():
         else:
             temp_adata = AnnData(X=X, var=pd.DataFrame(index=self.genes))
 
-        temp_adata = align_dataset(temp_adata, self.inferer.gene_order)
+        temp_adata = align_dataset(
+            temp_adata,
+            self.inferer.gene_order,
+            gene_overlap_threshold=self.gene_overlap_threshold,
+        )
         X_dense = temp_adata.X.toarray() if sp.issparse(temp_adata.X) else np.asarray(temp_adata.X)
         temp_X = preprocess_for_scimilarity(X_dense)
         cell_embs = self.inferer.get_embeddings(temp_X)
@@ -121,4 +129,3 @@ class ReconPretrainedscimilarity():
     def load(self, path: str, map_location=None) -> None:
         """Load model configuration"""
         self.inferer = self._load_pretrained_model(path)
-
