@@ -196,8 +196,7 @@ The full pipeline from **Direct** tabs:
        --all-genes-zarr data/luca/demo/expression.zarr \
        --target-genes-zarr data/luca/demo/expression.zarr \
        --embedding-key SE \
-       --num-workers 0 \
-       --batch-size 32 \
+       --reshuffle \
        --out results/luca-demo/fm/SE/MLP
 
    # 4. Reference PCA: reuse from end-to-end example
@@ -427,8 +426,7 @@ Train a one-layer MLP decoder.
              --all-genes-zarr data/luca/demo/expression.zarr \
              --target-genes-zarr data/luca/demo/expression.zarr \
              --embedding-key SE \
-             --num-workers 0 \
-             --batch-size 32 \
+             --reshuffle \
              --out results/luca-demo/fm/SE/MLP
 
    .. tab-item:: Slurm

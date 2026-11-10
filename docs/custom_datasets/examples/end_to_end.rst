@@ -649,3 +649,26 @@ Use the same checkpoint file as in evaluation.
 
 For configuration details see
 :doc:`Extract embeddings <../end_to_end/extract_embeddings>`.
+
+
+Runtime
+-------
+
+Training time on LuCA subsets:
+
+- **Models:** PCA, mlAE, and nlscVI (1 × 1,024 hidden, up to 100 epochs)
+- **Latent dimensions:** 10, 32, 128, 512, and 2,048; PCA is skipped when the
+  latent dimension is not smaller than the number of training cells
+- **Data:** 500, 1,000, 10,000, 100,000, and 892,296 cells; 5,983 HVGs
+- **Hardware:** one NVIDIA H100 80GB GPU, 20 CPUs (Intel Xeon Platinum 8480+),
+  128 GB RAM
+- **Repeats:** three per run
+- **Preparation:** 3.5-6.5 minutes per subset
+
+.. figure:: /_static/demo/luca_runtime.svg
+   :width: 100%
+
+   Mean ± SD over three runs, one panel per latent dimension.
+
+On the full dataset, PCA takes under a minute, nlscVI 22-26 minutes, and
+mlAE 12-45 minutes.

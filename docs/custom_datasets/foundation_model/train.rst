@@ -77,6 +77,9 @@ No YAML configuration is needed.
             :widths: 40, 25, 35
 
             "``--epochs``", "Optional; default: ``500``", "Maximum epochs"
+            "``--patience``", "Optional; default: ``10``", "Early-stopping patience on ``val/loss_epoch``; ``0`` disables early stopping"
+            "``--min-delta``", "Optional; default: ``5e-5``", "Smallest drop in ``val/loss_epoch`` that counts as an improvement"
+            "``--reshuffle``", "Optional flag; off by default", "Reshuffle training chunks every epoch"
             "``--lr``", "Optional; default: ``0.0001``", "Initial learning rate"
             "``--batch-size``", "Optional; default: ``256``", "Cells per batch"
             "``--chunk-size``", "Optional; default: ``5000``", "Rows per chunk"
@@ -103,6 +106,7 @@ Replace ``<model>`` and ``<embedding_key>`` with ``SE``, ``scGPT``,
      --all-genes-zarr /path/to/mydata/all_genes.zarr \
      --target-genes-zarr /path/to/mydata/target_genes.zarr \
      --embedding-key "<embedding_key>" \
+     --reshuffle \
      --out "/path/to/results/mydata/<model>/MLP"
 
 .. _custom-data-fm-decoder-training-outputs:
