@@ -580,7 +580,8 @@ For reference, the figure below shows models trained on the full LuCA dataset.
 .. figure:: /_static/demo/luca_distributional.svg
    :width: 100%
 
-   Full LuCA test metrics: unweighted means over 155 held-out combinations.
+   Full LuCA test metrics (70/15/15 train/val/test split by combination):
+   unweighted means over 155 held-out combinations.
    ``(rev)`` marks negated metrics; higher is better.
 
 
@@ -660,8 +661,7 @@ Training time on LuCA subsets:
 - **Latent dimensions:** 10, 32, 128, 512, and 2,048; PCA is skipped when the
   latent dimension is not smaller than the number of training cells
 - **Data:** 500, 1,000, 10,000, 100,000, and 892,296 cells; 5,983 HVGs
-- **Split:** new 70/15/15 train/val/test split by combination per subset,
-  not split 03
+- **Split:** 70/15/15 train/val/test split by combination per subset
 - **Hardware:** one NVIDIA H100 80GB GPU, 20 CPUs (Intel Xeon Platinum 8480+),
   128 GB RAM
 - **Repeats:** 3 per run

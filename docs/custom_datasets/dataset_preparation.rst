@@ -68,9 +68,6 @@ Create ``experiments/preprocessing/configs/data/mydata.yaml`` using ``configs/ba
 
 - ``train_ratio`` & ``val_ratio``: set proportions for training and validation; the remaining data forms the test split
 - ``seed``: random seed for reproducible sampling and splits
-- ``split.order_dir``: directory whose ``os.listdir()`` order sets the
-  combination order before splitting (default: ``null``, the order in
-  ``expression.zarr``); needed to reproduce a split made from a directory listing
 - ``demo``: randomly sample cells before preprocessing (default: ``false``)
 - ``demo_cells``: maximum number of sampled cells in demo mode (default: ``500``)
 
