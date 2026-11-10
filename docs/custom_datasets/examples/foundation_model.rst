@@ -617,6 +617,7 @@ Embedding extraction and MLP decoder training time on LuCA subsets:
   epochs with early stopping
 - **Data:** 500, 1,000, 10,000, 100,000, and 892,296 cells; 5,983 HVGs
 - **Split:** 70/15/15 train/val/test split by combination per subset
+- **Seed:** 42 for cell subsampling, splitting, and decoder training
 - **Hardware:** one NVIDIA H100 80GB GPU, 20 CPUs (Intel Xeon Platinum 8480+),
   128 GB RAM
 - **Repeats:** 3 per run
