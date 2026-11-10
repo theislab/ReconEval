@@ -1,7 +1,7 @@
 .. _custom-data-latent-shift:
 
-Latent shift
-------------
+Latent shift reconstruction
+---------------------------
 
 :doc:`Back to introduction <../custom_datasets>`
 

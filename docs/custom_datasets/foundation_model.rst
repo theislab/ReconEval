@@ -1,7 +1,7 @@
 .. _custom-data-foundation-model:
 
-Foundation model
-----------------
+Foundation model reconstruction
+-------------------------------
 
 :doc:`Back to introduction <../custom_datasets>`
 

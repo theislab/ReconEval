@@ -3,7 +3,7 @@
 Train
 ~~~~~
 
-:doc:`Back to Foundation model <../foundation_model>`
+:doc:`Back to Foundation model reconstruction <../foundation_model>`
 
 To explore a demo using the LuCA dataset, see the
 :doc:`Foundation-model tutorial <../../tutorials/fm>`.
@@ -56,7 +56,7 @@ No YAML configuration is needed.
             "``--emb-val-zarr``", "Required", "Validation expression (``X``) and embeddings: ``/path/to/mydata/embeddings/<model>/val.zarr``"
             "``--all-genes-zarr``", "Required", "Expression gene order in root ``var_names``: ``/path/to/mydata/all_genes.zarr``"
             "``--target-genes-zarr``", "Required", "Output gene order in root ``var_names``: ``/path/to/mydata/target_genes.zarr``"
-            "``--embedding-key``", "Required", "Embedding key in both stores: ``SE``, ``scGPT``, ``scConcept``, or ``scimilarity``"
+            "``--embedding-key``", "Required", "Embedding key in both stores: ``SE``, ``scGPT``, ``scConcept``, ``scimilarity``, ``Geneformer``, ``UCE``, or ``scFoundation``"
 
       .. tab-item:: Model
 
@@ -96,7 +96,8 @@ repository root. For cluster submission, follow
 :ref:`Run through Slurm <slurm-parameters>`.
 
 Replace ``<model>`` and ``<embedding_key>`` with ``SE``, ``scGPT``,
-``scConcept``, or lowercase ``scimilarity``:
+``scConcept``, lowercase ``scimilarity``, ``Geneformer``, ``UCE``, or
+``scFoundation``:
 
 .. code-block:: bash
 

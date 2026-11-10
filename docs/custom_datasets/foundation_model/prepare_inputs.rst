@@ -3,7 +3,7 @@
 Prepare inputs
 ~~~~~~~~~~~~~~
 
-:doc:`Back to Foundation model <../foundation_model>`
+:doc:`Back to Foundation model reconstruction <../foundation_model>`
 
 For general preprocessing of lightweight datasets with ``prepare_dataset.py``,
 see :doc:`Data preparation <../dataset_preparation>`.
@@ -156,7 +156,7 @@ these stores:
    └── target_genes.zarr/             # root var_names attribute
 
 Replace ``<model>`` and ``<embedding_key>`` with ``SE``, ``scGPT``,
-``scConcept``, or ``scimilarity``.
+``scConcept``, ``scimilarity``, ``Geneformer``, ``UCE``, or ``scFoundation``.
 
 - ``all_genes.zarr.attrs["var_names"]``: all expression genes in ``X`` column order
 - ``target_genes.zarr.attrs["var_names"]``: selected genes in decoder output order

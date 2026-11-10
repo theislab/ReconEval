@@ -1,12 +1,13 @@
-Foundation model
-================
+Foundation model reconstruction
+===============================
 
 :doc:`Back to examples <../examples>`
 
 This example runs the foundation model workflow with SE on 500 cells and
 500 genes from the LuCA dataset.
 
-The Slurm scripts also run scGPT, scConcept, and SCimilarity.
+The Slurm scripts also run scGPT, scConcept, SCimilarity, Geneformer, UCE,
+and scFoundation.
 
 How to run
 ----------
@@ -24,7 +25,8 @@ Run from the repository root. Containers use the same paths as **Direct**.
          conda activate <reconeval-state | reconeval>
 
       - ``<reconeval-state | reconeval>``: use ``reconeval-state`` for SE embedding
-        extraction and ``reconeval`` for all other steps.
+        extraction and ``reconeval`` for all other steps. Other models extract
+        embeddings in ``reconeval-<model>``, e.g. ``reconeval-geneformer``.
 
       Then, from the repository root, run ``[PYTHON COMMAND]`` shown in the
       **Direct** tab of each step.
@@ -222,7 +224,8 @@ Reuse ``data/luca/demo/`` if those steps are already complete.
 1. Prepare checkpoints
 ----------------------
 
-Download SE, scGPT, scConcept, and SCimilarity checkpoints:
+Download SE, scGPT, scConcept, SCimilarity, Geneformer, UCE, and scFoundation
+checkpoints:
 
 .. tab-set::
 
@@ -339,6 +342,10 @@ Run SE on all demo groups for decoder training and evaluation.
              -n reconeval-state [PYTHON COMMAND]
 
 **Outputs:** ``data/luca/demo/embeddings/SE/grouped.zarr``
+
+Geneformer and UCE take raw counts: the Slurm script first writes
+``data/luca/demo/counts.zarr`` from the ``count`` layer of the source h5ad,
+with the same groups, cells, and genes as ``expression.zarr``.
 
 For configuration details see
 :doc:`Extract embeddings <../foundation_model/extract_embeddings>`.
@@ -551,7 +558,7 @@ For configuration details see :doc:`Evaluate <../foundation_model/evaluate>`.
 6. Summarize metrics
 --------------------
 
-After evaluating all four models:
+After evaluating all seven models:
 
 .. tab-set::
 
@@ -597,3 +604,30 @@ Means across test groups. Higher R² and lower other metrics are better.
    :header-rows: 1
 
 Model performance may be limited by the small demo split.
+
+
+Runtime
+-------
+
+Embedding extraction and MLP decoder training time on LuCA subsets:
+
+- **Models:** SE, scGPT, scConcept, and SCimilarity
+- **Embedding dimensions:** 2,058 (SE), 512 (scGPT, scConcept), 128 (SCimilarity)
+- **Decoder:** 1 hidden layer of 1,024, 2,048, or 4,096 units, up to 500
+  epochs with early stopping
+- **Data:** 500, 1,000, 10,000, 100,000, and 892,296 cells; 5,983 HVGs
+- **Split:** new 70/15/15 train/val/test split by combination per subset,
+  not split 03
+- **Hardware:** one NVIDIA H100 80GB GPU, 20 CPUs (Intel Xeon Platinum 8480+),
+  128 GB RAM
+- **Repeats:** 3 per run
+
+.. figure:: /_static/demo/luca_runtime_fm.svg
+   :width: 100%
+
+   Mean ± SD over three runs. Left: embedding extraction; other panels:
+   decoder training per model and hidden size.
+
+On the full dataset, embedding extraction takes 7 minutes (SCimilarity),
+9 minutes (scConcept), 31 minutes (scGPT), and 2.3 hours (SE); decoder
+training takes 11-27 minutes.

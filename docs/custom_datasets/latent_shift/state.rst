@@ -3,7 +3,7 @@
 Run STATE from CLI
 ~~~~~~~~~~~~~~~~~~
 
-:doc:`Back to Latent shift <../latent_shift>`
+:doc:`Back to Latent shift reconstruction <../latent_shift>`
 
 For cluster submission, follow :ref:`Run through Slurm <slurm-parameters>`.
 

@@ -3,7 +3,7 @@
 Combine expression and embeddings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:doc:`Back to Foundation model <../foundation_model>`
+:doc:`Back to Foundation model reconstruction <../foundation_model>`
 
 Prepare training and validation stores for the MLP decoder.
 
@@ -41,7 +41,8 @@ Run
 Activate ``reconeval`` using the :ref:`installation instructions <custom-data-installation>`
 and run from the repository root, or follow :ref:`Run through Slurm <slurm-parameters>`.
 
-Replace ``<model>`` with ``SE``, ``scGPT``, ``scConcept``, or ``scimilarity``:
+Replace ``<model>`` with ``SE``, ``scGPT``, ``scConcept``, ``scimilarity``,
+``Geneformer``, ``UCE``, or ``scFoundation``:
 
 .. code-block:: bash
 

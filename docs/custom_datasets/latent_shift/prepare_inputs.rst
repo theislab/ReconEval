@@ -3,7 +3,7 @@
 Add expression, embeddings, and conditions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:doc:`Back to Latent shift <../latent_shift>`
+:doc:`Back to Latent shift reconstruction <../latent_shift>`
 
 For general preprocessing of lightweight datasets with ``prepare_dataset.py``,
 see :doc:`Data preparation <../dataset_preparation>`.

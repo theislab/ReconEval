@@ -1,7 +1,7 @@
 Extract embeddings
 ~~~~~~~~~~~~~~~~~~
 
-:doc:`Back to Foundation model <../foundation_model>`
+:doc:`Back to Foundation model reconstruction <../foundation_model>`
 
 Generate embeddings with a frozen foundation model for decoder training
 and evaluation.

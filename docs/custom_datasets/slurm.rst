@@ -38,7 +38,7 @@ Skip this section for direct Python runs.
 
 4. Add the complete Python command from your task's CLI section:
    :ref:`End-to-end <custom-data-e2e-cli>`,
-   :ref:`Foundation model <custom-data-mlp-cli>`,
+   :ref:`Foundation model reconstruction <custom-data-mlp-cli>`,
    :ref:`STATE <custom-data-state-cli>`, or
    :ref:`CellFlow <custom-data-cellflow-cli>`.
    Set your input paths, output directory, and model options there.

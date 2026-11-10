@@ -3,7 +3,7 @@
 Data configuration
 ~~~~~~~~~~~~~~~~~~
 
-:doc:`Back to Foundation model <../foundation_model>`
+:doc:`Back to Foundation model reconstruction <../foundation_model>`
 
 Each stage requires different configurations for data:
 
@@ -124,7 +124,7 @@ No YAML configuration is needed.
       "``--emb-val-zarr``", "Required", "Validation store containing ``X`` and embeddings: ``/path/to/mydata/embeddings/<model>/val.zarr``"
       "``--all-genes-zarr``", "Required", "Gene-list store whose root ``var_names`` attribute lists expression genes in column order: ``/path/to/mydata/all_genes.zarr``"
       "``--target-genes-zarr``", "Required", "Gene-list store whose root ``var_names`` attribute lists all or selected expression genes in decoder output order: ``/path/to/mydata/target_genes.zarr``"
-      "``--embedding-key``", "Required", "Embedding array name in both stores: ``SE``, ``scGPT``, ``scConcept``, or ``scimilarity``"
+      "``--embedding-key``", "Required", "Embedding array name in both stores: ``SE``, ``scGPT``, ``scConcept``, ``scimilarity``, ``Geneformer``, ``UCE``, or ``scFoundation``"
 
 .. _custom-data-fm-evaluation-config:
 

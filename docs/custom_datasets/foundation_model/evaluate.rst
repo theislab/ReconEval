@@ -1,7 +1,7 @@
 Evaluate
 ~~~~~~~~
 
-:doc:`Back to Foundation model <../foundation_model>`
+:doc:`Back to Foundation model reconstruction <../foundation_model>`
 
 **Overview**
 
@@ -143,7 +143,7 @@ Set parameters in YAML or pass ``key=value`` overrides on the CLI.
             :widths: 40, 25, 35
 
             "``data``", "Required", "Dataset configuration, e.g. ``mydata``"
-            "``pretrained``", "Required", "Foundation model used for the embeddings: ``SE``, ``scGPT``, ``scConcept``, or ``scimilarity``"
+            "``pretrained``", "Required", "Foundation model used for the embeddings: ``SE``, ``scGPT``, ``scConcept``, ``scimilarity``, ``Geneformer``, ``UCE``, or ``scFoundation``"
             "``decoder``", "Optional; default: ``MLP``", "Decoder configuration matching the trained checkpoint"
             "``metric``", "Required", "Selected metric configuration, e.g. ``decode_statistical`` or ``decode_coexpression``"
             "``emb_zarr_path``", "Required", "Grouped embedding store containing ``<group>/X``"
@@ -208,7 +208,8 @@ Run
 Run from the repository root in ``reconeval``, or use
 :ref:`Slurm <slurm-parameters>`.
 
-Replace ``<model>`` with ``SE``, ``scGPT``, ``scConcept``, or ``scimilarity``.
+Replace ``<model>`` with ``SE``, ``scGPT``, ``scConcept``, ``scimilarity``,
+``Geneformer``, ``UCE``, or ``scFoundation``.
 Set ``train_fraction=0`` and ``test_fraction=1`` to evaluate all held-out groups.
 
 **Distributional metrics**

@@ -47,8 +47,8 @@ Advanced usage
 Or follow the advanced instructions for your own data:
 
 - :doc:`End-to-end reconstruction <custom_datasets/end_to_end>`
-- :doc:`Foundation model <custom_datasets/foundation_model>`
-- :doc:`Latent shift <custom_datasets/latent_shift>`
+- :doc:`Foundation model reconstruction <custom_datasets/foundation_model>`
+- :doc:`Latent shift reconstruction <custom_datasets/latent_shift>`
 
 The instructions use ``mydata`` as the dataset name and ``/path/to/...`` for
 paths; replace these placeholders with your own values.

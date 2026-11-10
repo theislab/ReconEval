@@ -1,7 +1,7 @@
 Outputs
 ~~~~~~~
 
-:doc:`Back to Foundation model <../foundation_model>`
+:doc:`Back to Foundation model reconstruction <../foundation_model>`
 
 **Model files.**
 

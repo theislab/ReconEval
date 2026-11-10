@@ -1,7 +1,7 @@
 Outputs
 ~~~~~~~
 
-:doc:`Back to Latent shift <../latent_shift>`
+:doc:`Back to Latent shift reconstruction <../latent_shift>`
 
 **Model files**
 

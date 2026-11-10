@@ -68,6 +68,9 @@ Create ``experiments/preprocessing/configs/data/mydata.yaml`` using ``configs/ba
 
 - ``train_ratio`` & ``val_ratio``: set proportions for training and validation; the remaining data forms the test split
 - ``seed``: random seed for reproducible sampling and splits
+- ``split.order_dir``: directory whose ``os.listdir()`` order sets the
+  combination order before splitting (default: ``null``, the order in
+  ``expression.zarr``); needed to reproduce a split made from a directory listing
 - ``demo``: randomly sample cells before preprocessing (default: ``false``)
 - ``demo_cells``: maximum number of sampled cells in demo mode (default: ``500``)
 
@@ -138,5 +141,5 @@ Additionally:
 For task-specific input details, see:
 
 - :doc:`End-to-end reconstruction <end_to_end/prepare_inputs>`
-- :doc:`Foundation model <foundation_model/prepare_inputs>`
-- :doc:`Latent shift <latent_shift/prepare_inputs>`
+- :doc:`Foundation model reconstruction <foundation_model/prepare_inputs>`
+- :doc:`Latent shift reconstruction <latent_shift/prepare_inputs>`

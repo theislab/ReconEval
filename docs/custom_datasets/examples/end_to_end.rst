@@ -660,9 +660,11 @@ Training time on LuCA subsets:
 - **Latent dimensions:** 10, 32, 128, 512, and 2,048; PCA is skipped when the
   latent dimension is not smaller than the number of training cells
 - **Data:** 500, 1,000, 10,000, 100,000, and 892,296 cells; 5,983 HVGs
+- **Split:** new 70/15/15 train/val/test split by combination per subset,
+  not split 03
 - **Hardware:** one NVIDIA H100 80GB GPU, 20 CPUs (Intel Xeon Platinum 8480+),
   128 GB RAM
-- **Repeats:** three per run
+- **Repeats:** 3 per run
 - **Preparation:** 3.5-6.5 minutes per subset
 
 .. figure:: /_static/demo/luca_runtime.svg

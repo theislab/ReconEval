@@ -6,7 +6,7 @@ Extract embeddings (optional)
 Extract embeddings from a trained model for downstream tasks:
 
 - For inputs, see :ref:`Embedding extraction inputs <custom-data-e2e-embedding-inputs>`
-- Train perturbation-response models, e.g. STATE :cite:p:`adduri:25` or CellFlow :cite:p:`klein:25`, see :ref:`Latent shift <custom-data-latent-shift>` for details
+- Train perturbation-response models, e.g. STATE :cite:p:`adduri:25` or CellFlow :cite:p:`klein:25`, see :ref:`Latent shift reconstruction <custom-data-latent-shift>` for details
 
 Configure
 ^^^^^^^^^
