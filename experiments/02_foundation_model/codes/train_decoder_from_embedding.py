@@ -8,7 +8,7 @@ regenerate the corresponding decoder checkpoint with one command, one env.
 Assumes:
   - FM embeddings live in a zarr store with keys `X` (gene expression) and
     `<embedding_key>` (cell embeddings), e.g. `SE`, `scGPT`, `scConcept`,
-    `scimilarity`.
+    `scimilarity`, `Geneformer`, `UCE`, `scFoundation`.
   - Two zarr stores describe the gene axes:
       * `all_genes_zarr.attrs['var_names']`     — the full gene set the
         embeddings were computed against
@@ -37,9 +37,12 @@ import numpy as np
 import torch
 import zarr
 from lightning.pytorch import seed_everything
-from lightning.pytorch.callbacks import ModelCheckpoint
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
-from sc_reconstruction.dataloaders.datamodules import SubsetDaskDecodeOnlyDataModule
+from sc_reconstruction.dataloaders.datamodules import (
+    DatasetEpochCallback,
+    SubsetDaskDecodeOnlyDataModule,
+)
 from sc_reconstruction.decoders.reconmlp import ReconMLPDecoder
 
 
@@ -62,14 +65,16 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--target-genes-zarr", required=True, type=Path,
                    help="Zarr whose attrs.var_names lists the HVG SUBSET to decode")
     p.add_argument("--embedding-key", required=True,
-                   choices=["SE", "scGPT", "scConcept", "scimilarity"],
+                   choices=["SE", "scGPT", "scConcept", "scimilarity",
+                            "Geneformer", "UCE", "scFoundation"],
                    help="Which FM embedding to read from the zarr")
     # ---- model ----
     p.add_argument("--latent-dim", type=int, default=None,
                    help="FM embedding dim. If omitted, auto-detected from the "
                         "train zarr as `zarr[<embedding_key>].shape[1]`. "
                         "Actual paper dims: SE=2058, scGPT=512, scConcept=512, "
-                        "scimilarity=128.")
+                        "scimilarity=128, Geneformer=1152, UCE=1280, "
+                        "scFoundation=3072.")
     p.add_argument("--n-layers", type=int, default=1)
     p.add_argument("--hidden", type=int, default=4096)
     p.add_argument("--distribution", default="normal",
@@ -80,6 +85,12 @@ def parse_args() -> argparse.Namespace:
                    help="Only 'none' is honored for decoder-only training.")
     # ---- training ----
     p.add_argument("--epochs", type=int, default=500)
+    p.add_argument("--patience", type=int, default=10,
+                   help="EarlyStopping patience on val/loss_epoch; 0 disables early stopping")
+    p.add_argument("--min-delta", type=float, default=5e-5,
+                   help="EarlyStopping min_delta on val/loss_epoch")
+    p.add_argument("--reshuffle", action="store_true",
+                   help="Reshuffle training chunks every epoch (DatasetEpochCallback)")
     p.add_argument("--lr", type=float, default=1e-4)
     p.add_argument("--batch-size", type=int, default=256)
     p.add_argument("--chunk-size", type=int, default=5_000)
@@ -179,16 +190,32 @@ def main():
         every_n_epochs=1,
         verbose=True,
     )
-    trainer_kwargs = dict(max_epochs=args.epochs, logger=False, callbacks=[ckpt_cb])
+    callbacks = [ckpt_cb]
+    if args.reshuffle:
+        callbacks.append(DatasetEpochCallback())
+    early_stop_cb = None
+    if args.patience > 0:
+        early_stop_cb = EarlyStopping(
+            monitor="val/loss_epoch",
+            min_delta=args.min_delta,
+            patience=args.patience,
+            mode="min",
+            verbose=True,
+        )
+        callbacks.append(early_stop_cb)
+    trainer_kwargs = dict(max_epochs=args.epochs, logger=False, callbacks=callbacks)
     if args.limit_train_batches is not None:
         trainer_kwargs["limit_train_batches"] = args.limit_train_batches
     if args.limit_val_batches is not None:
         trainer_kwargs["limit_val_batches"] = args.limit_val_batches
     if args.max_steps is not None:
         trainer_kwargs["max_steps"] = args.max_steps
-    print(f"[train] epochs={args.epochs} lr={args.lr} hidden={args.hidden} "
-          f"layers={args.n_layers} latent_dim={args.latent_dim} gene_dim={gene_dim}")
+    print(f"[train] epochs={args.epochs} patience={args.patience} reshuffle={args.reshuffle} "
+          f"lr={args.lr} hidden={args.hidden} layers={args.n_layers} "
+          f"latent_dim={args.latent_dim} gene_dim={gene_dim}")
     decoder.train(datamodule=dm, **trainer_kwargs)
+    if early_stop_cb is not None and early_stop_cb.stopped_epoch > 0:
+        print(f"[done] early stopped at epoch {early_stop_cb.stopped_epoch}")
     print(f"[done] best ckpt at {ckpt_cb.best_model_path}")
 
 

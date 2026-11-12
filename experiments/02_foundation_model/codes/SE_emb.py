@@ -21,8 +21,22 @@ if STATE_SRC:
     sys.path.insert(0, STATE_SRC)
 
 from sc_reconstruction.utils.data_tools import *
+import sc_reconstruction.models.reconse as reconse
 from hydra.utils import instantiate
 from lightning.pytorch import seed_everything
+from torch.utils.data import DataLoader
+
+_create_dataloader = reconse.create_dataloader
+
+
+# SE forks one loader worker per group; forking this multi-threaded process occasionally deadlocks the worker.
+def _create_dataloader_in_process(*args, **kwargs):
+    loader = _create_dataloader(*args, **kwargs)
+    return DataLoader(loader.dataset, batch_size=loader.batch_size, shuffle=False,
+                      collate_fn=loader.collate_fn, num_workers=0)
+
+
+reconse.create_dataloader = _create_dataloader_in_process
 
 
 @hydra.main(config_path='../configs/pretrained', config_name="SE", version_base=None)
