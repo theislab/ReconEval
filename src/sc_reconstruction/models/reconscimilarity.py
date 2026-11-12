@@ -51,7 +51,7 @@ class ReconPretrainedscimilarity():
         self,
         checkpoint_path: str, 
         emb_key: str = 'X_scimilarity',
-        gene_overlap_threshold: int = SCIMILARITY_GENE_OVERLAP,
+        gene_overlap_threshold: int | None = None,
         **kwargs
     ):
         """Pre-trained SCimilarity foundation model wrapper.
@@ -63,8 +63,11 @@ class ReconPretrainedscimilarity():
         Args:
             checkpoint_path: Path to the pre-trained model checkpoint
                 (config, model weights, gene mapping).
-            gene_overlap_threshold: Minimum number of genes shared with the model.
+            gene_overlap_threshold: Minimum number of genes shared with the model;
+                ``None`` uses SCimilarity's default.
         """
+        if gene_overlap_threshold is None:
+            gene_overlap_threshold = SCIMILARITY_GENE_OVERLAP
         if gene_overlap_threshold < SCIMILARITY_GENE_OVERLAP:
             warnings.warn(
                 f"gene_overlap_threshold={gene_overlap_threshold} is below SCimilarity's "
