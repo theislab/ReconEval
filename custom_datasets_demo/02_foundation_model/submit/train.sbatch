@@ -27,7 +27,7 @@ export APPTAINERENV_CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES"
 # Commands to run inside the container
 # ---------------------------------------------------------------------------
 CMD=$(cat <<'COMMAND'
-for model in SE scGPT scConcept scimilarity; do
+for model in SE scGPT scConcept scimilarity Geneformer UCE scFoundation; do
     ## Train the MLP decoder
     python -u experiments/02_foundation_model/codes/train_decoder_from_embedding.py \
         --emb-train-zarr "results/luca-demo/fm/$model/emb_combined/train.zarr" \
@@ -35,8 +35,7 @@ for model in SE scGPT scConcept scimilarity; do
         --all-genes-zarr data/luca/demo/expression.zarr \
         --target-genes-zarr data/luca/demo/expression.zarr \
         --embedding-key "$model" \
-        --num-workers 0 \
-        --batch-size 32 \
+        --reshuffle \
         --out "results/luca-demo/fm/$model/MLP"
 done
 COMMAND
@@ -48,6 +47,7 @@ COMMAND
 mkdir -p results/luca-demo/tmp
 apptainer exec --cleanenv --nv \
     --env TMPDIR=/work/results/luca-demo/tmp \
+    --env PYTHONPATH=/work/src \
     --bind "$PWD:/work" \
     --bind "$(realpath results):$(realpath results)" \
     --bind "$data_dir:$(readlink data)" \

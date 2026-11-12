@@ -1,4 +1,4 @@
-"""Print and save mean metrics for the four foundation-model demo runs.
+"""Print and save mean metrics for the foundation-model demo runs.
 
 Run from the repository root after evaluate.sbatch completes.
 Each evaluated test group has equal weight. The table is printed to the terminal
@@ -13,7 +13,7 @@ from pathlib import Path
 from statistics import mean
 
 
-MODELS = ("SE", "scGPT", "scConcept", "scimilarity")
+MODELS = ("SE", "scGPT", "scConcept", "scimilarity", "Geneformer", "UCE", "scFoundation")
 METRICS = ("r2_score", "mse", "mmd_rbf", "energy_distance")
 
 

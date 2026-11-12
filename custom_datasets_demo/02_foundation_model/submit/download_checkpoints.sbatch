@@ -16,6 +16,19 @@ cd "${SLURM_SUBMIT_DIR:?}"
 image=/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif
 pretrained_dir=$(realpath checkpoints/pretrained)
 
+# ---------------------------------------------------------------------------
+# Hugging face authentication
+# ---------------------------------------------------------------------------
+# Anonymous Hugging Face downloads are rate-limited per IP.
+# Uncomment if you encounter a rate limit; set hf_dir to your Hugging Face directory
+# (the token file is created by `hf auth login`):
+# ---------------------------------------------------------------------------
+#
+# hf_dir=/path/to/huggingface
+# if [[ -f "$hf_dir/token" ]]; then
+#     export APPTAINERENV_HF_TOKEN=$(<"$hf_dir/token")
+# fi
+
 apptainer exec --cleanenv \
     --bind "$PWD:/work" \
     --bind "$pretrained_dir:$(readlink checkpoints/pretrained)" \

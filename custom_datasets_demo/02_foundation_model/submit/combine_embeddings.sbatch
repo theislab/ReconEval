@@ -24,7 +24,7 @@ data_dir=$(realpath data)
 # Commands to run inside the container
 # ---------------------------------------------------------------------------
 CMD=$(cat <<'COMMAND'
-for model in SE scGPT scConcept scimilarity; do
+for model in SE scGPT scConcept scimilarity Geneformer UCE scFoundation; do
     python -u experiments/preprocessing/combine_emb_zarr.py \
         --expression-zarr data/luca/demo/expression.zarr \
         --split-meta-zarr data/luca/demo/split_metadata.zarr \

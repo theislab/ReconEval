@@ -2,7 +2,7 @@
 # Submit from the repository root after download_checkpoints.sbatch completes:
 # mkdir -p logs
 # sbatch custom_datasets_demo/02_foundation_model/submit/extract_embeddings.sbatch
-# Embed all demo groups with SE, scGPT, scConcept, and SCimilarity.
+# Embed all demo groups with SE, scGPT, scConcept, SCimilarity, Geneformer, UCE, and scFoundation.
 #SBATCH --job-name=luca-demo-fm-emb
 #SBATCH --partition=gpu_p
 #SBATCH --qos=gpu_normal
@@ -21,7 +21,7 @@ cd "${SLURM_SUBMIT_DIR:?}"
 image=/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif
 data_dir=$(realpath data)
 pretrained_dir=$(realpath checkpoints/pretrained)
-mkdir -p data/luca/demo/embeddings/{SE,scGPT,scConcept,scimilarity}
+mkdir -p data/luca/demo/embeddings/{SE,scGPT,scConcept,scimilarity,Geneformer,UCE,scFoundation}
 mkdir -p checkpoints/pretrained/scConcept/Corpus-30M/cache
 
 export APPTAINERENV_CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES"
@@ -43,6 +43,40 @@ expression = zarr.open("data/luca/demo/expression.zarr", mode="r+")
 expression.attrs["var_ensembl_ids_38"] = [
     gene_ids[gene].split(".")[0] for gene in expression.attrs["var_names"]
 ]
+PY
+
+## Geneformer and UCE take raw counts: copy the "count" layer into expression.zarr's groups.
+conda run --no-capture-output -n reconeval python - <<'PY'
+import h5py
+import numpy as np
+import pandas as pd
+import zarr
+from anndata.io import read_elem
+
+expression = zarr.open("data/luca/demo/expression.zarr", mode="r")
+counts = zarr.open("data/luca/demo/counts.zarr", mode="w")
+counts.attrs.update(expression.attrs.asdict())
+with h5py.File("data/luca/core_250130.h5ad", "r") as source:
+    obs = source["obs"]
+    obs_names = pd.Index(read_elem(obs[obs.attrs["_index"]]))
+    var = read_elem(source["var"])
+    genes = pd.Index(var["feature_name"]).get_indexer(expression.attrs["var_names"])
+    layer = source["layers/count"]
+    n_genes = layer.attrs["shape"][1]
+    indptr = layer["indptr"]
+    for name in expression.group_keys():
+        obs_index = expression[name]["obs_index"][:]
+        rows = obs_names.get_indexer(obs_index)
+        assert (rows >= 0).all() and (genes >= 0).all(), name
+        X = np.zeros((len(rows), len(genes)), dtype=np.float32)
+        for i, row in enumerate(rows):
+            start, end = indptr[row], indptr[row + 1]
+            cell = np.zeros(n_genes, dtype=np.float32)
+            cell[layer["indices"][start:end]] = layer["data"][start:end]
+            X[i] = cell[genes]
+        group = counts.create_group(name)
+        group.create_dataset("X", data=X)
+        group.create_dataset("obs_index", data=obs_index)
 PY
 
 ## SE
@@ -98,6 +132,45 @@ conda run --no-capture-output -n reconeval-scimilarity \
         parts=1 \
         total_parts=1
 
+## Geneformer
+conda run --no-capture-output -n reconeval-geneformer \
+    python -u experiments/02_foundation_model/codes/Geneformer_emb.py \
+        model_args.checkpoint_path=checkpoints/pretrained/Geneformer/Geneformer-V2-316M \
+        data_args.comb_meta_root=data/luca/demo/counts.zarr \
+        data_args.split_meta_root=data/luca/demo/split_metadata.zarr \
+        data_args.target_key=null \
+        data_args.output_dir=data/luca/demo/embeddings/Geneformer/grouped.zarr \
+        data_args.var_names_path=data/luca/demo/counts.zarr \
+        data_args.var_names_key=var_ensembl_ids_38 \
+        parts=1 \
+        total_parts=1
+
+## UCE
+conda run --no-capture-output -n reconeval-uce \
+    python -u experiments/02_foundation_model/codes/UCE_emb.py \
+        model_args.checkpoint_path=checkpoints/pretrained/UCE \
+        data_args.comb_meta_root=data/luca/demo/counts.zarr \
+        data_args.split_meta_root=data/luca/demo/split_metadata.zarr \
+        data_args.target_key=null \
+        data_args.output_dir=data/luca/demo/embeddings/UCE/grouped.zarr \
+        data_args.var_names_path=data/luca/demo/counts.zarr \
+        data_args.var_names_key=var_names \
+        parts=1 \
+        total_parts=1
+
+## scFoundation (expects log1p-normalized expression)
+conda run --no-capture-output -n reconeval-scfoundation \
+    python -u experiments/02_foundation_model/codes/scFoundation_emb.py \
+        model_args.checkpoint_path=checkpoints/pretrained/scFoundation \
+        data_args.comb_meta_root=data/luca/demo/expression.zarr \
+        data_args.split_meta_root=data/luca/demo/split_metadata.zarr \
+        data_args.target_key=null \
+        data_args.output_dir=data/luca/demo/embeddings/scFoundation/grouped.zarr \
+        data_args.var_names_path=data/luca/demo/expression.zarr \
+        data_args.var_names_key=var_names \
+        parts=1 \
+        total_parts=1
+
 COMMAND
 )
 
@@ -107,6 +180,7 @@ COMMAND
 mkdir -p results/luca-demo/tmp
 apptainer exec --cleanenv --nv \
     --env TMPDIR=/work/results/luca-demo/tmp \
+    --env PYTHONPATH=/work/src \
     --bind "$PWD:/work" \
     --bind "$(realpath results):$(realpath results)" \
     --bind "$pretrained_dir:$(readlink checkpoints/pretrained)" \

@@ -26,14 +26,19 @@ data_dir=$(realpath data)
 # ---------------------------------------------------------------------------
 CMD=$(cat <<'COMMAND'
 ## Set the saved decoder checkpoint path for each model.
+## Replace <checkpoint> with the checkpoint file name in results/luca-demo/fm/<model>/MLP/
+## (train.sbatch logs it as "[done] best ckpt at ...").
 declare -A checkpoints=(
     [SE]='results/luca-demo/fm/SE/MLP/<checkpoint>.ckpt'
     [scGPT]='results/luca-demo/fm/scGPT/MLP/<checkpoint>.ckpt'
     [scConcept]='results/luca-demo/fm/scConcept/MLP/<checkpoint>.ckpt'
     [scimilarity]='results/luca-demo/fm/scimilarity/MLP/<checkpoint>.ckpt'
+    [Geneformer]='results/luca-demo/fm/Geneformer/MLP/<checkpoint>.ckpt'
+    [UCE]='results/luca-demo/fm/UCE/MLP/<checkpoint>.ckpt'
+    [scFoundation]='results/luca-demo/fm/scFoundation/MLP/<checkpoint>.ckpt'
 )
 
-for model in SE scGPT scConcept scimilarity; do
+for model in SE scGPT scConcept scimilarity Geneformer UCE scFoundation; do
     ## Distributional metrics (R2, MSE, MMD, energy distance)
     python -u experiments/02_foundation_model/codes/eval_decoder_statistical.py \
         --config-dir custom_datasets_demo/02_foundation_model/configs \
