@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import scanpy as sc
 import numpy as np
 import scipy.sparse as sp
@@ -10,6 +11,8 @@ from anndata import AnnData
 from scimilarity import CellEmbedding
 from scimilarity.utils import align_dataset, lognorm_counts
 import pandas as pd
+
+SCIMILARITY_GENE_OVERLAP = inspect.signature(align_dataset).parameters["gene_overlap_threshold"].default
 
 
 def _is_raw_counts(X):
@@ -48,7 +51,7 @@ class ReconPretrainedscimilarity():
         self,
         checkpoint_path: str, 
         emb_key: str = 'X_scimilarity',
-        gene_overlap_threshold: int = 5000,
+        gene_overlap_threshold: int = SCIMILARITY_GENE_OVERLAP,
         **kwargs
     ):
         """Pre-trained SCimilarity foundation model wrapper.
@@ -62,6 +65,13 @@ class ReconPretrainedscimilarity():
                 (config, model weights, gene mapping).
             gene_overlap_threshold: Minimum number of genes shared with the model.
         """
+        if gene_overlap_threshold < SCIMILARITY_GENE_OVERLAP:
+            warnings.warn(
+                f"gene_overlap_threshold={gene_overlap_threshold} is below SCimilarity's "
+                f"default of {SCIMILARITY_GENE_OVERLAP} shared genes. SCimilarity is not intended for inputs "
+                "with this few genes.",
+                UserWarning,
+            )
         self.model_params = {
             'checkpoint_path': checkpoint_path,
             'emb_key': emb_key,
