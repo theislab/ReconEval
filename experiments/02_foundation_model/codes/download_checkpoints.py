@@ -16,7 +16,18 @@ HF_MODELS = {
     "SE":        ("arcinstitute/SE-600M",  ["se600m_epoch16.ckpt", "protein_embeddings.pt"], None),
     "scGPT":     ("wanglab/scGPT-human",   ["best_model.pt", "args.json", "vocab.json"],      None),
     "scConcept": ("theislab/scConcept",    ["Corpus-30M/*"],                                  "Corpus-30M"),
+    "Geneformer": ("ctheodoris/Geneformer", ["Geneformer-V2-316M/*"],                         "Geneformer-V2-316M"),
+    "scFoundation": ("genbio-ai/scFoundation", ["models.ckpt"],                               None),
 }
+
+# UCE model files (figshare article 24320806); protein_embeddings.tar.gz unpacks to protein_embeddings/.
+UCE_FILES = {
+    "33l_8ep_1024t_1280.torch":  "https://ndownloader.figshare.com/files/43423236",
+    "all_tokens.torch":          "https://ndownloader.figshare.com/files/42706585",
+    "species_chrom.csv":         "https://ndownloader.figshare.com/files/42706558",
+    "species_offsets.pkl":       "https://ndownloader.figshare.com/files/42706555",
+}
+UCE_PROTEIN_EMBEDDINGS_URL = "https://ndownloader.figshare.com/files/42715213"
 
 SCIMILARITY_URL = "https://zenodo.org/records/10685499/files/model_v1.1.tar.gz?download=1"
 SCIMILARITY_FILES = [
@@ -103,8 +114,29 @@ def download_scimilarity(directory: Path) -> Path:
     return checkpoint_dir
 
 
+def download_uce(directory: Path) -> Path:
+    downloader = URLDownloader(retries=3, timeout=60, retry_delay=10)
+    for name, url in UCE_FILES.items():
+        destination = directory / name
+        if not (destination.is_file() and destination.stat().st_size > 0):
+            downloader.download(url, destination)
+
+    embeddings_dir = directory / "protein_embeddings"
+    if not any(embeddings_dir.glob("*.pt")):
+        archive = directory / "protein_embeddings.tar.gz"
+        if not archive.is_file():
+            downloader.download(UCE_PROTEIN_EMBEDDINGS_URL, archive)
+        print("Extracting UCE protein embeddings...", flush=True)
+        with tarfile.open(archive, mode="r:gz") as tar:
+            tar.extractall(path=directory, filter="data")
+        if not any(embeddings_dir.glob("*.pt")):
+            raise FileNotFoundError(f"Extraction incomplete, no embeddings in {embeddings_dir}")
+        archive.unlink()
+    return directory
+
+
 def main() -> None:
-    all_models = ["SE", "scGPT", "scConcept", "scimilarity"]
+    all_models = ["SE", "scGPT", "scConcept", "scimilarity", "Geneformer", "UCE", "scFoundation"]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True, choices=all_models + ["all"])
     parser.add_argument("--output-dir", type=Path, default=Path("checkpoints/pretrained"))
@@ -119,6 +151,8 @@ def main() -> None:
 
         if model == "scimilarity":
             checkpoint_dir = download_scimilarity(directory)
+        elif model == "UCE":
+            checkpoint_dir = download_uce(directory)
         else:
             checkpoint_dir = download_huggingface(model, directory)
 

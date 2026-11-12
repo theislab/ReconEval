@@ -1,0 +1,19 @@
+meta:
+  name: UCE
+  latent_dim: 1280
+
+model_args:
+  _target_: sc_reconstruction.models.reconuce.ReconPretrainedUCE
+  checkpoint_path: checkpoints/pretrained/UCE
+  workdir: null
+
+data_args:
+  split_meta_root: "/lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/pbmc_counts_ag/comb_w_obs.zarr"
+  comb_meta_root: "/lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/pbmc_counts_ag/comb_w_obs.zarr"
+  target_key: "combinations"
+  output_dir: "/lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/pbmc_UCE/UCE_emb.zarr"
+  var_names_path: "/lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/pbmc_w_ag/comb_w_obs.zarr"
+  var_names_key: "var_names"
+
+parts: 1
+total_parts: 15
