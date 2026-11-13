@@ -1,4 +1,3 @@
-import dask.array as da
 import zarr
 from scipy.sparse import csr_matrix, vstack
 import anndata as ad
@@ -7,6 +6,8 @@ import warnings
 from tqdm import tqdm
 
 def transform_to_csr(path, chunk_size=1_000_000):
+    import dask.array as da
+
     if not os.path.isdir(path):
         warnings.warn(f"Path doesn't exist: {path}")
         return None
