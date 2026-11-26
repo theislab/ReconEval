@@ -27,7 +27,7 @@ Documentation
 =============
 
 Full documentation, API reference and rendered tutorials at
-`reconeval.readthedocs.io <https://reconeval.readthedocs.io>`_.
+`reconeval.readthedocs.io <https://reconeval.readthedocs.io/en/custom_data_guideline/index.html>`_.
 
 What ReconEval evaluates
 ========================

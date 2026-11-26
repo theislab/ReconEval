@@ -1,0 +1,12 @@
+# Evaluation configuration for AE.
+# Override model.load.path and model.load.model_name on the CLI.
+meta:
+  name: AE
+
+load:
+  path: ???
+  model_name: ???
+  additional_params:
+    distribution: normal
+    library_size_mode: none
+    input_dim: ${data.input_dim}

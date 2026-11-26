@@ -416,22 +416,21 @@ class MetricsBatchEvaluator:
             os.remove(output_path)
             print(f"Existing output file {output_path} removed.")
 
-        pd.DataFrame(
-            columns=[
-                "combination",
-                "combination_ref",
-                *self.split_key,
-                "n_cells",
-                "n_cells_recon",
-                *list(self.metric_funcs.keys()),
-            ]
-        ).to_csv(output_path, index=False)
+        columns = [
+            "combination",
+            "combination_ref",
+            *self.split_key,
+            "n_cells",
+            "n_cells_recon",
+            *list(self.metric_funcs.keys()),
+        ]
+        pd.DataFrame(columns=columns).to_csv(output_path, index=False)
 
         batch_gen = self._dynamic_batch_generator()
         with tqdm(total=len(self.all_combs), desc="Total progress") as pbar:
             for batch in batch_gen:
                 batch_results = self._process_batch(batch)
-                pd.DataFrame(batch_results).to_csv(
+                pd.DataFrame(batch_results, columns=columns).to_csv(
                     output_path, mode='a', header=False, index=False
                 )
                 pbar.update(len(batch))

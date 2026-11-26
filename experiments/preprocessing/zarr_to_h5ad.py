@@ -1,6 +1,8 @@
+import sys
+
 from sc_reconstruction.utils.data_tools import transform_to_csr
 
-zarr_paths = [
+zarr_paths = sys.argv[1:] or [
     '/lustre/groups/ml01/workspace/xiaotong.fu/data/reconstruction/pbmc_w_ag/comb_w_obs.zarr',
 ]
 

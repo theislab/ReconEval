@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import scanpy as sc
 import numpy as np
 import scipy.sparse as sp
@@ -10,6 +11,8 @@ from anndata import AnnData
 from scimilarity import CellEmbedding
 from scimilarity.utils import align_dataset, lognorm_counts
 import pandas as pd
+
+SCIMILARITY_GENE_OVERLAP = inspect.signature(align_dataset).parameters["gene_overlap_threshold"].default
 
 
 def _is_raw_counts(X):
@@ -48,6 +51,7 @@ class ReconPretrainedscimilarity():
         self,
         checkpoint_path: str, 
         emb_key: str = 'X_scimilarity',
+        gene_overlap_threshold: int | None = None,
         **kwargs
     ):
         """Pre-trained SCimilarity foundation model wrapper.
@@ -59,14 +63,27 @@ class ReconPretrainedscimilarity():
         Args:
             checkpoint_path: Path to the pre-trained model checkpoint
                 (config, model weights, gene mapping).
+            gene_overlap_threshold: Minimum number of genes shared with the model;
+                ``None`` uses SCimilarity's default.
         """
+        if gene_overlap_threshold is None:
+            gene_overlap_threshold = SCIMILARITY_GENE_OVERLAP
+        if gene_overlap_threshold < SCIMILARITY_GENE_OVERLAP:
+            warnings.warn(
+                f"gene_overlap_threshold={gene_overlap_threshold} is below SCimilarity's "
+                f"default of {SCIMILARITY_GENE_OVERLAP} shared genes. SCimilarity is not intended for inputs "
+                "with this few genes.",
+                UserWarning,
+            )
         self.model_params = {
             'checkpoint_path': checkpoint_path,
             'emb_key': emb_key,
+            'gene_overlap_threshold': gene_overlap_threshold,
         }
 
         self.inferer = self._load_pretrained_model(checkpoint_path)
         self.emb_key = emb_key
+        self.gene_overlap_threshold = gene_overlap_threshold
         self.genes = None
         self.overlap_genes = None
 
@@ -93,7 +110,11 @@ class ReconPretrainedscimilarity():
         else:
             temp_adata = AnnData(X=X, var=pd.DataFrame(index=self.genes))
 
-        temp_adata = align_dataset(temp_adata, self.inferer.gene_order)
+        temp_adata = align_dataset(
+            temp_adata,
+            self.inferer.gene_order,
+            gene_overlap_threshold=self.gene_overlap_threshold,
+        )
         X_dense = temp_adata.X.toarray() if sp.issparse(temp_adata.X) else np.asarray(temp_adata.X)
         temp_X = preprocess_for_scimilarity(X_dense)
         cell_embs = self.inferer.get_embeddings(temp_X)
@@ -121,4 +142,3 @@ class ReconPretrainedscimilarity():
     def load(self, path: str, map_location=None) -> None:
         """Load model configuration"""
         self.inferer = self._load_pretrained_model(path)
-

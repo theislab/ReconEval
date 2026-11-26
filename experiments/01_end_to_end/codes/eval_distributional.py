@@ -34,15 +34,24 @@ def main(cfg: DictConfig) -> None:
         model.load(cfg.model.load.path, map_location=running_device)
         print(f"Loaded model from {cfg.model.load.path} using direct instantiation")
 
-    # patch for old mlae models
-    import types
-    def patched_forward_modeled(self, x):
-        z = self.encoder(x)
-        library_size = self.l_encoder(x)
-        return self.decoder(z, library_size)
-    model.module._forward_modeled = types.MethodType(patched_forward_modeled, model.module)
-    model.module.forward_fn = model.module._forward_modeled 
-    print("Patched model's modeld lib forward function for compatibility.")
+    # Older mlAE checkpoints used the library encoder output directly. Fresh
+    # models use their own forward implementation, including its exponentiation.
+    module = getattr(model, "module", None)
+    if (
+        cfg.get("legacy_mlae_forward", True)
+        and cfg.model.meta.name == "mlAE"
+        and getattr(module, "l_encoder", None) is not None
+    ):
+        import types
+
+        def patched_forward_modeled(self, x):
+            z = self.encoder(x)
+            library_size = self.l_encoder(x)
+            return self.decoder(z, library_size)
+
+        module._forward_modeled = types.MethodType(patched_forward_modeled, module)
+        module.forward_fn = module._forward_modeled
+        print("Using legacy mlAE modeled-library forward implementation.")
     
     # Load projection model (e.g., PCA)
     print("Loading projection model...")
@@ -109,4 +118,4 @@ def main(cfg: DictConfig) -> None:
     print("Successfully saved results to:", save_path)
 
 if __name__ == "__main__":
-    main() 
+    main()

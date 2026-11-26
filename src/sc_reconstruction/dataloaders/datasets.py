@@ -221,10 +221,10 @@ class DaskDecodeOnlyIterableDataset(IterableDataset):
         rank_groups = chunk_groups[rank_start:rank_end]
 
         # Drop remainder so every worker gets exactly the same number of groups
-        usable_w = (len(rank_groups) // num_workers) * num_workers
+        usable_w = max(1, len(rank_groups) // num_workers) * num_workers
         rank_groups = rank_groups[:usable_w]
 
-        groups_per_worker = len(rank_groups) // num_workers
+        groups_per_worker = max(1, len(rank_groups) // num_workers)
         start_idx = worker_id * groups_per_worker
         end_idx = start_idx + groups_per_worker
         assigned_groups = rank_groups[start_idx:end_idx]
@@ -260,8 +260,8 @@ class DaskDecodeOnlyIterableDataset(IterableDataset):
 
             num_samples = merged_X.shape[0]
             # Drop last partial batch to keep batch counts identical across ranks
-            num_full_batches = num_samples // self.batch_size
-            for b in range(num_full_batches):
+            num_batches = max(1, num_samples // self.batch_size)
+            for b in range(num_batches):
                 i = b * self.batch_size
                 end_idx = i + self.batch_size
                 batch_X = merged_X[i:end_idx]

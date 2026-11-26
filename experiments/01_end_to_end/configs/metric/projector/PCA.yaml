@@ -1,0 +1,20 @@
+# Reference PCA for distributional evaluation.
+# Override metric.projector.load.path on the CLI with
+# [mean.zarr path, pc_N.zarr path].
+# Add an entry under projector_args for each dataset you evaluate.
+projector_args:
+  tahoe:
+    n_components: 50
+  luca:
+    n_components: 50
+  pbmc:
+    n_components: 50
+
+model_args:
+  _target_: sc_reconstruction.models.reconpca.ReconPCA
+  n_components: ${metric.projector.projector_args.${data.name}.n_components}
+
+load:
+  path:
+    - ???
+    - ???

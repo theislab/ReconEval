@@ -1,3 +1,4 @@
 # runs/configs/trainer/PCA.yaml
 save_mean: true
+temp_dir: null  # Use the system temporary directory unless overridden.
 save_path: ${model.save.dir}/${model.save.filename}

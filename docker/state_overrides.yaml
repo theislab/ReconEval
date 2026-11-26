@@ -1,0 +1,5 @@
+numpy: numpy=2.2.6
+scikit-learn: scikit-learn=1.6.1
+pytorch: pytorch-gpu=2.7.1
+pytorch-cuda: cuda-version=12.6
+arc-state: arc-state==0.9.32

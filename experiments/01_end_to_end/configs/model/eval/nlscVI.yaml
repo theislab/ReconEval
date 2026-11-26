@@ -1,0 +1,11 @@
+# Evaluation configuration for nlscVI.
+# Override model.load.path and model.load.model_name on the CLI.
+meta:
+  name: nlscVI
+
+load:
+  path: ???
+  model_name: ???
+  additional_params:
+    gene_likelihood: normal
+    use_observed_lib_size: true

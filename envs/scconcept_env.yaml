@@ -24,6 +24,7 @@ dependencies:
   # scConcept's Transformer decoder uses FlashAttention (Ampere+ GPUs)
   - pytorch=2.6.*
   - pytorch-cuda=12.4
+  - torchvision=0.21.0
   - lightning=2.6.*
   - torchmetrics=1.8.*
   - hydra-core=1.3.*
@@ -31,8 +32,11 @@ dependencies:
   - wandb=0.20.*
   - pip
   - pip:
-      # The `concept` package (scConcept) is internal; install from your clone.
-      # Replace this line with the appropriate pip URL or git+https://...
-      - concept
-      - flash-attn  # requires Ampere or newer GPU at runtime
+      - lamindb==1.6.2
+      - lamindb-setup==1.6.1
+      - einops==0.8.1
+      - torchdata==0.11.0
+      - huggingface-hub==1.2.3
+      # Install scConcept, lamin-dataloader v0.1.0 and FlashAttention with --no-deps;
+      # the container does this in docker/setup.sh.
       - -e ..
