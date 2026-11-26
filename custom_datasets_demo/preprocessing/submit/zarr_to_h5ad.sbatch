@@ -2,6 +2,7 @@
 # Submit from the repository root:
 # mkdir -p logs
 # sbatch custom_datasets_demo/preprocessing/submit/zarr_to_h5ad.sbatch
+# Convert training cells for the PCA baseline and all expression for reference PCA.
 #SBATCH --job-name=luca-demo-h5ad
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
@@ -16,7 +17,8 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif}
+## Set the absolute path to your Apptainer image
+image=/path/to/reconeval-all.sif
 
 # ---------------------------------------------------------------------------
 # Run — mount the repository and preserve the external data path
@@ -32,4 +34,5 @@ apptainer exec --cleanenv \
   conda run --no-capture-output -n reconeval \
   env PYTHONPATH=/work/src \
   python -u experiments/preprocessing/zarr_to_h5ad.py \
-    "$(realpath data)/luca/demo/expression.zarr"
+    "$(realpath data)/luca/demo/expression.zarr" \
+    "$(realpath data)/luca/demo/train.zarr"

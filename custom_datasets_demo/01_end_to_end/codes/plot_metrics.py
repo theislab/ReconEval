@@ -2,6 +2,7 @@
 
 Run from the repository root after evaluate.sbatch completes.
 Each point is the unweighted mean over evaluated combinations; NaNs are omitted.
+Lower-is-better metrics are negated so higher values are better in every panel.
 """
 
 import argparse
@@ -16,12 +17,13 @@ import pandas as pd
 
 
 MODELS = {"PCA": ("#ffbf00", "D"), "mlAE": ("#2171b5", "^"), "nlscVI": ("#ae017e", "P")}
+LABELS = {"PCA": "PCA", "mlAE": "AE", "nlscVI": "VAE"}
 LATENTS = [10, 32, 128]
 METRICS = {
-    "r2_score": "R² (higher is better)",
-    "mse": "MSE (lower is better)",
-    "mmd_rbf": "MMD RBF (lower is better)",
-    "energy_distance": "Energy distance (lower is better)",
+    "r2_score": "R² (↑)",
+    "mse": "−MSE (rev) (↑)",
+    "mmd_rbf": "−MMD RBF (rev) (↑)",
+    "energy_distance": "−Energy distance (rev) (↑)",
 }
 
 
@@ -47,15 +49,16 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
 
     def draw(ax, metric):
+        direction = 1 if metric == "r2_score" else -1
         for model, (color, marker) in MODELS.items():
             rows = summary[(summary.model == model) & (summary.metric == metric)]
-            ax.plot(rows.latent, rows["mean"], color=color, marker=marker,
-                    linewidth=1.5, markersize=6, label=model)
+            ax.plot(rows.latent, direction * rows["mean"], color=color, marker=marker,
+                    linewidth=1.5, markersize=6, label=LABELS[model])
         ax.set(xticks=LATENTS, xlabel="Latent dimension",
                ylabel=METRICS[metric], title="LuCA demo")
         ax.grid(linestyle="--", alpha=0.3)
         ax.spines[["top", "right"]].set_visible(False)
-        ax.legend(frameon=False)
+        ax.legend(frameon=False, loc="best")
 
     fig, axes = plt.subplots(2, 2, figsize=(11, 7.6), layout="constrained")
     for ax, metric in zip(axes.flat, METRICS):

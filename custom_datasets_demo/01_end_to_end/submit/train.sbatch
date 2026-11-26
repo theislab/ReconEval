@@ -19,7 +19,8 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif}
+## Set the absolute path to your Apptainer image
+image=/path/to/reconeval-all.sif
 output_dir=results/luca-demo
 mkdir -p "$output_dir/logs"
 
@@ -29,7 +30,6 @@ export APPTAINERENV_CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES"
 # Commands to run inside the container
 # ---------------------------------------------------------------------------
 CMD=$(cat <<'COMMAND'
-export WANDB_MODE=offline
 task_id=${1:?Pass the Slurm array task ID}
 models=(PCA mlAE nlscVI)
 latent_dims=(10 32 128)
@@ -53,6 +53,7 @@ python -u experiments/01_end_to_end/codes/train.py \
 ;;
 
 mlAE)
+# AE and VAE log to Weights & Biases; offline saves logs locally
 python -u experiments/01_end_to_end/codes/train.py \
     --config-dir custom_datasets_demo/01_end_to_end/configs \
     data=custom_luca_demo \
@@ -64,10 +65,12 @@ python -u experiments/01_end_to_end/codes/train.py \
     model.model_args.n_latent="$latent_dim" \
     'weights.dir=results/luca-demo/mlAE/${model.model_args.n_latent}' \
     logging.dir=results/luca-demo/logs \
-    hydra.run.dir="results/luca-demo/hydra/mlAE/$latent_dim"
+    hydra.run.dir="results/luca-demo/hydra/mlAE/$latent_dim" \
+    +model.logging.wandb.offline=true
 ;;
 
 nlscVI)
+# AE and VAE log to Weights & Biases; offline saves logs locally
 python -u experiments/01_end_to_end/codes/train.py \
     --config-dir custom_datasets_demo/01_end_to_end/configs \
     data=custom_luca_demo \
@@ -78,7 +81,8 @@ python -u experiments/01_end_to_end/codes/train.py \
     model.model_args.n_latent="$latent_dim" \
     'weights.dir=results/luca-demo/nlscVI/${model.model_args.n_latent}' \
     logging.dir=results/luca-demo/logs \
-    hydra.run.dir="results/luca-demo/hydra/nlscVI/$latent_dim"
+    hydra.run.dir="results/luca-demo/hydra/nlscVI/$latent_dim" \
+    +model.logging.wandb.offline=true
 ;;
 esac
 COMMAND

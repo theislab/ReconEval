@@ -2,7 +2,6 @@
 # Submit from the repository root:
 # mkdir -p logs
 # sbatch custom_datasets_demo/preprocessing/submit/prepare_dataset.sbatch
-# Override the image with RECONEVAL_IMAGE if needed.
 #SBATCH --job-name=luca-demo
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
@@ -18,7 +17,8 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif}
+## Set the absolute path to your Apptainer image
+image=/path/to/reconeval-all.sif
 data_dir=$(realpath data)
 input_file=data/luca/core_250130.h5ad
 output_dir=data/luca/demo
@@ -51,5 +51,6 @@ apptainer exec --cleanenv \
     seed=42 \
     split.strategy=combination \
     split.path=null \
+    +save_counts=true \
     hydra.run.dir="$output_dir/logs" \
     hydra.job.chdir=false

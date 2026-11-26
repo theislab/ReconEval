@@ -10,4 +10,4 @@ input_dim: 500
 
 model_specific:
   PCA:
-    train_path: data/luca/demo/expression.h5ad  # single combined h5ad for sklearn PCA
+    train_path: data/luca/demo/train.h5ad  # reconstruction PCA uses training cells only

@@ -11,7 +11,8 @@
 
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR:?}"
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif}
+## Set the absolute path to your Apptainer image
+image=/path/to/reconeval-all.sif
 mkdir -p results/luca-demo/tmp
 apptainer exec --cleanenv \
     --env TMPDIR=/work/results/luca-demo/tmp \

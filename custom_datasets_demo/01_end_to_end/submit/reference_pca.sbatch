@@ -19,7 +19,8 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=${RECONEVAL_IMAGE:-/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif}
+## Set the absolute path to your Apptainer image
+image=/path/to/reconeval-all.sif
 output_dir=results/luca-demo/reference-pca
 mkdir -p "$output_dir/logs"
 
@@ -29,13 +30,12 @@ export APPTAINERENV_CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES"
 # Commands to run inside the container
 # ---------------------------------------------------------------------------
 CMD=$(cat <<'COMMAND'
-export WANDB_MODE=offline
-
 python -u experiments/01_end_to_end/codes/train.py \
     --config-dir custom_datasets_demo/01_end_to_end/configs \
     data=custom_luca_demo \
     model=train/PCA \
     trainer=PCA \
+    data.model_specific.PCA.train_path=data/luca/demo/expression.h5ad \
     'trainer.temp_dir=${weights.dir}/pca-work' \
     model.model_args.n_components=50 \
     weights.dir=results/luca-demo/reference-pca \

@@ -18,16 +18,15 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif
+## Set the absolute path to your Apptainer image
+image=/path/to/reconeval-all.sif
 data_dir=$(realpath data)
 
 # ---------------------------------------------------------------------------
 # Commands to run inside the container
 # ---------------------------------------------------------------------------
 CMD=$(cat <<'COMMAND'
-## Set the saved decoder checkpoint path for each model.
-## Replace <checkpoint> with the checkpoint file name in results/luca-demo/fm/<model>/MLP/
-## (train.sbatch logs it as "[done] best ckpt at ...").
+## Set <checkpoint>.ckpt to your decoder checkpoint filename for each model.
 declare -A checkpoints=(
     [SE]='results/luca-demo/fm/SE/MLP/<checkpoint>.ckpt'
     [scGPT]='results/luca-demo/fm/scGPT/MLP/<checkpoint>.ckpt'

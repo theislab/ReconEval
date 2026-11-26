@@ -18,7 +18,8 @@ cd "${SLURM_SUBMIT_DIR:?}"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-image=/lustre/scratch/users/olga.novitskaia/reconeval-images/42016471/reconeval-all.sif
+## Set the absolute path to your Apptainer image
+image=/path/to/reconeval-all.sif
 data_dir=$(realpath data)
 
 export APPTAINERENV_CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES"
