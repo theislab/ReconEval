@@ -9,8 +9,14 @@ For cluster submission, follow :ref:`Run through Slurm <slurm-parameters>`.
 
 **Run STATE:**
 
-1. Activate ``reconeval-pancellflow`` from the
-   :ref:`installation step <custom-data-installation>`
+1. Use the dedicated ``reconeval-state`` environment for **STATE** training
+   and **SE** embedding extraction; reserve ``reconeval-pancellflow`` for
+   **CellFlow**. Follow the :ref:`STATE environment setup <state-environment>`,
+   then activate it:
+
+   .. code-block:: bash
+
+      conda activate reconeval-state
 
 2. Copy ``template_train.toml`` and ``template_val.toml`` from
    ``experiments/03_latent_shift/configs/st/`` to ``mydata_train.toml`` and
@@ -24,7 +30,7 @@ For cluster submission, follow :ref:`Run through Slurm <slurm-parameters>`.
    Update ``DATA_KWARGS_COMMON`` for your metadata keys and control label
 
 4. Set the representation, decoder checkpoint, and output directory, then
-   train STATE. The checkpoint must match the embedding width and output
+   train **STATE**. The checkpoint must match the embedding width and output
    gene order. For ``AE_128`` embeddings:
 
    .. code-block:: bash
@@ -61,6 +67,6 @@ For cluster submission, follow :ref:`Run through Slurm <slurm-parameters>`.
       "``--no_wandb``", "Optional; default: false", "Pass this flag to disable W&B logging"
       "``--out_root``", "Optional; default: script's OUT_ROOT", "Output root; a run subdirectory is created. Set a writable path for your run"
 
-For PCA, set the decoder's ``mean_path`` and ``pc_path`` in
+For **PCA**, set the decoder's ``mean_path`` and ``pc_path`` in
 ``DECODER_CONFIGS``.
 

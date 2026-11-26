@@ -5,12 +5,12 @@ Latent shift reconstruction
 
 :doc:`Back to introduction <../custom_datasets>`
 
-For STATE and CellFlow :cite:p:`klein:25`, generate embeddings using a model trained in
+For **STATE** and **CellFlow** :cite:p:`klein:25`, generate embeddings using a model trained in
 :ref:`End-to-end <custom-data-end-to-end>` or a pretrained foundation model
 (:ref:`embedding preparation <custom-data-mlp-data>`). Use the same encoder for all
 splits and save embeddings in ``.obsm`` (e.g. ``.obsm["X_AE_128"]``).
 
-For embeddings from the pretrained State Embedding (SE) foundation model
+For embeddings from the pretrained **State Embedding** (**SE**) foundation model
 :cite:p:`adduri:25`, see the
 `foundation-model tutorial <../tutorials/fm.html#embed-with-a-foundation-model>`_.
 

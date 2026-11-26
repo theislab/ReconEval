@@ -12,7 +12,7 @@ see :doc:`Data preparation <../dataset_preparation>`.
 Training
 ^^^^^^^^
 
-- For AE and scVI variants, provide one cells-by-genes matrix per
+- For **AE** and **scVI** variants, provide one cells-by-genes matrix per
   split, stored as a Zarr array or under ``X``:
 
   .. code-block:: text
@@ -22,7 +22,7 @@ Training
      ├── val.zarr
      └── test.zarr
 
-- PCA instead reads ``train.h5ad`` from the same directory, with expression
+- **PCA** instead reads ``train.h5ad`` from the same directory, with expression
   stored as a CSR matrix in ``.X``
 
 .. _custom-data-e2e-reference-pca-inputs:
@@ -35,7 +35,7 @@ Combine measured training, validation, and test expression in
 Store a cells-by-genes CSR matrix in ``.X``, preserving evaluation
 preprocessing and gene order.
 
-Use this file only to fit the reference PCA.
+Use this file only to fit the reference **PCA**.
 
 .. _custom-data-e2e-eval-inputs:
 

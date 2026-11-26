@@ -22,6 +22,9 @@ Use:
 - ``.h5ad`` file
 - ``split_metadata.zarr`` (optional)
 
+Expression in ``.X`` or the selected layer can be a dense NumPy array or a
+SciPy sparse matrix in CSR or CSC format.
+
 Configure
 -----------
 
@@ -40,6 +43,8 @@ Create ``experiments/preprocessing/configs/data/mydata.yaml`` using ``configs/ba
      method: n_top_genes
      n_top_genes: 2000
    layer: null                 # .X, or the name of a layer
+   normalize: true             # normalize each cell to 1e4 total counts
+   log1p: true                 # apply log1p after normalization
    columns: [???, ????, ???]
    var_names_col: null          # .var_names, or the name of a .var column
    split:
@@ -56,19 +61,26 @@ Create ``experiments/preprocessing/configs/data/mydata.yaml`` using ``configs/ba
 - ``n_top_genes``: select a fixed number of genes with ``hvg.n_top_genes``
 - ``dispersion``: select genes using thresholds set by ``hvg.min_mean``,
   ``hvg.max_mean``, and ``hvg.min_disp``
-- ``precomputed``: use existing annotations in the ``.var`` column specified by ``hvg.column``
+- ``precomputed``: use existing annotations in the ``.var`` column specified by ``hvg.column``.
+  Supports Boolean ``True``/``False`` and string ``"True"``/``"False"`` flags;
+  genes marked ``True`` or ``"True"`` are selected.
 
 **Split strategy**
 
 - ``combination``: split by group
-- ``category``: split by a selected grouping key
-- ``read``: reuse existing split assignments
+- ``category``: split by the grouping key specified by ``split.column``;
+  choose one of the configured ``columns``
+- ``read``: reuse existing split assignments; set ``split.path`` to the
+  existing ``split_metadata.zarr`` store
 
 **Additional settings**
 
 - ``train_ratio`` & ``val_ratio``: set proportions for training and validation; the remaining data forms the test split
+- ``normalize`` & ``log1p``: normalize to ``1e4`` total counts and apply ``log1p`` (default: ``true``);
+  if turned off and ``.X`` holds raw counts, use ``hvg.method: precomputed`` (if applicable) to keep the same genes as a normalized run
 - ``seed``: random seed for reproducible sampling and splits
-- ``demo``: randomly sample cells before preprocessing (default: ``false``)
+- ``demo``: randomly sample cells after normalization and HVG selection,
+  before grouping and splitting (default: ``false``)
 - ``demo_cells``: maximum number of sampled cells in demo mode (default: ``500``)
 
 See ``configs/data/luca.yaml`` and ``configs/data/pbmc.yaml`` for examples.
@@ -130,8 +142,11 @@ evaluation. The script saves them as Zarr files in the directory specified by
 
 Additionally:
 
-- use ``zarr_to_h5ad.py`` to create ``.h5ad`` inputs for PCA
+- use ``zarr_to_h5ad.py`` to create ``.h5ad`` inputs for **PCA**
 - use ``expression.zarr`` for embedding extraction
+- add ``+save_counts=true`` to also write ``counts.zarr``: the input expression before normalization
+  (the layer set by the ``layer`` setting, e.g. ``count`` for LuCA, or ``.X`` if ``layer: null``),
+  with the same groups, cells, and genes as ``expression.zarr`` (needed by **Geneformer** and **UCE**)
 
 **Foundation model** and **latent shift** workflows require additional preparation.
 

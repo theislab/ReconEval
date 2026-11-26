@@ -6,6 +6,9 @@ End-to-end reconstruction
 This example runs the end-to-end workflow on 500 cells and 500 genes from
 the LuCA dataset.
 
+Besides **PCA**, this tutorial focuses on **AE**, the modeled library-size
+variant (``mlAE``), and **VAE**, the no library-size variant (``nlscVI``).
+
 How to run
 ----------
 
@@ -39,6 +42,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
 
          [SLURM HEADERS]
 
+         image=/path/to/reconeval-all.sif
          [PATHS AND APPTAINER SETUP]
 
          CMD=$(cat <<'COMMAND'
@@ -49,7 +53,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
          mkdir -p results/luca-demo/tmp
          apptainer exec [APPTAINER OPTIONS] \
              --env TMPDIR=/work/results/luca-demo/tmp \
-             /path/to/reconeval-all.sif \
+             "$image" \
              conda run --no-capture-output -n reconeval \
              bash -e -c "$CMD"
 
@@ -76,7 +80,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
            - ``--pwd /work``: set the working directory
            - ``--nv``: enable NVIDIA GPU access
 
-         - ``/path/to/reconeval-all.sif``: absolute path to your Apptainer image
+         - ``/path/to/reconeval-all.sif``: path to your Apptainer image; set it in each script
          - ``[SLURM SCRIPT]``: the path to the ``.sbatch`` file for the step,
            e.g. ``custom_datasets_demo/01_end_to_end/submit/train.sbatch``
 
@@ -147,11 +151,13 @@ The full pipeline from **Direct** tabs:
        demo_genes=500 \
        seed=42 \
        split.strategy=combination \
-       split.path=null
+       split.path=null \
+       +save_counts=true #raw counts for Geneformer and UCE in the foundation-model example
 
-   # 0. Prerequisites: Convert expression store to .h5ad
+   # 0. Prerequisites: Convert training and full expression stores to .h5ad
    python experiments/preprocessing/zarr_to_h5ad.py \
-       "$(realpath data)/luca/demo/expression.zarr"
+       "$(realpath data)/luca/demo/expression.zarr" \
+       "$(realpath data)/luca/demo/train.zarr"
 
    # 1. Train (example: mlAE, latent dim 10)
    python experiments/01_end_to_end/codes/train.py \
@@ -163,7 +169,8 @@ The full pipeline from **Direct** tabs:
        model.model_args.library_size_mode=modeled \
        'model.model_args.n_hidden=[1024]' \
        model.model_args.n_latent=10 \
-       'weights.dir=results/luca-demo/mlAE/10'
+       'weights.dir=results/luca-demo/mlAE/10' \
+       +model.logging.wandb.offline=true #AE and VAE log to Weights & Biases; offline saves logs locally
 
    # 2. Reference PCA
    python experiments/01_end_to_end/codes/train.py \
@@ -171,6 +178,7 @@ The full pipeline from **Direct** tabs:
        data=custom_luca_demo \
        model=train/PCA \
        trainer=PCA \
+       data.model_specific.PCA.train_path=data/luca/demo/expression.h5ad \
        'trainer.temp_dir=${weights.dir}/pca-work' \
        model.model_args.n_components=50 \
        weights.dir=results/luca-demo/reference-pca
@@ -224,7 +232,8 @@ The commands below prepare the LuCA demo and save the output to ``data/luca/demo
              demo_genes=500 \
              seed=42 \
              split.strategy=combination \
-             split.path=null
+             split.path=null \
+             +save_counts=true #raw counts for Geneformer and UCE in the foundation-model example
 
    .. tab-item:: Slurm
 
@@ -263,9 +272,10 @@ The commands below prepare the LuCA demo and save the output to ``data/luca/demo
 
 To use your own dataset, see :doc:`Data preparation <../dataset_preparation>` details. 
 
-**Convert the expression store to .h5ad**
+**Convert the expression stores to .h5ad**
 
-Convert ``expression.zarr`` to ``expression.h5ad`` for reference PCA:
+Convert ``train.zarr`` to ``train.h5ad`` for the **PCA** reconstruction baseline,
+and ``expression.zarr`` to ``expression.h5ad`` for reference **PCA**:
 
 .. tab-set::
 
@@ -275,7 +285,8 @@ Convert ``expression.zarr`` to ``expression.h5ad`` for reference PCA:
 
          # [PYTHON COMMAND]
          python experiments/preprocessing/zarr_to_h5ad.py \
-             "$(realpath data)/luca/demo/expression.zarr"
+             "$(realpath data)/luca/demo/expression.zarr" \
+             "$(realpath data)/luca/demo/train.zarr"
 
    .. tab-item:: Slurm
 
@@ -315,7 +326,9 @@ Convert ``expression.zarr`` to ``expression.h5ad`` for reference PCA:
 1. Train
 -------------
 
-Train **PCA**, **mlAE**, and **nlscVI** at latent dimensions 10, 32, and 128.
+Train **PCA**, **AE**, and **VAE** at latent dimensions 10, 32, and 128.
+
+The **PCA** baseline is fitted on training cells only, using ``train.h5ad``.
 
 The ``[PYTHON COMMAND]`` example below shows one model; the Slurm script sweeps all three:
 
@@ -336,11 +349,12 @@ The ``[PYTHON COMMAND]`` example below shows one model; the Slurm script sweeps 
              model.model_args.library_size_mode=modeled \
              'model.model_args.n_hidden=[1024]' \
              model.model_args.n_latent=10 \
-             'weights.dir=results/luca-demo/mlAE/10'
+             'weights.dir=results/luca-demo/mlAE/10' \
+             +model.logging.wandb.offline=true #AE and VAE log to Weights & Biases; offline saves logs locally
 
    .. tab-item:: Slurm
 
-      The script submits nine array tasks: **PCA**, **mlAE**, and **nlscVI**
+      The script submits nine array tasks: **PCA**, **AE**, and **VAE**
       at latent dims 10, 32, and 128. Each task requests one GPU and can run
       in parallel as cluster resources become available:
 
@@ -391,7 +405,8 @@ For configuration details see :doc:`Train <../end_to_end/train>`.
 2. Reference PCA
 ----------------------
 
-Fit a reference PCA on all demo expression data for distributional evaluation.
+Fit a reference **PCA** on all demo expression data in ``expression.h5ad``
+for distributional evaluation.
 
 Temporary files are stored in ``pca-work`` under ``weights.dir``.
 
@@ -407,6 +422,7 @@ Temporary files are stored in ``pca-work`` under ``weights.dir``.
              data=custom_luca_demo \
              model=train/PCA \
              trainer=PCA \
+             data.model_specific.PCA.train_path=data/luca/demo/expression.h5ad \
              'trainer.temp_dir=${weights.dir}/pca-work' \
              model.model_args.n_components=50 \
              weights.dir=results/luca-demo/reference-pca
@@ -454,14 +470,14 @@ For configuration details see :doc:`Reference PCA <../end_to_end/reference_pca>`
 3. Evaluate
 -----------------
 
-Reconstruct held-out expression and compute distributional metrics for PCA,
-mlAE, and nlscVI at latent dimensions 10, 32, and 128.
+Reconstruct held-out expression and compute distributional metrics for **PCA**,
+**AE**, and **VAE** at latent dimensions 10, 32, and 128.
 
 .. tab-set::
 
    .. tab-item:: Direct
 
-      Set ``<run>`` to your training-run folder and ``<checkpoint>`` to your decoder checkpoint filename:
+      Set ``<run>`` to your training-run folder and ``<checkpoint>`` to the checkpoint path inside it:
 
       **Distributional metrics**
 
@@ -526,8 +542,8 @@ For configuration details see :doc:`Evaluate <../end_to_end/evaluate>`.
 4. Plot distributional metrics
 ------------------------------
 
-After evaluation, plot the four metrics against latent dimension for PCA, mlAE,
-and nlscVI:
+After evaluation, plot the four metrics against latent dimension for **PCA**, **AE**,
+and **VAE**:
 
 .. tab-set::
 
@@ -656,23 +672,113 @@ For configuration details see
 Runtime
 -------
 
-Training time on LuCA subsets:
-
-- **Models:** PCA, mlAE, and nlscVI (1 × 1,024 hidden, up to 100 epochs)
-- **Latent dimensions:** 10, 32, 128, 512, and 2,048; PCA is skipped when the
-  latent dimension is not smaller than the number of training cells
-- **Data:** 500, 1,000, 10,000, 100,000, and 892,296 cells; 5,983 HVGs
-- **Split:** 70/15/15 train/val/test split by combination per subset
-- **Seed:** 42 for cell subsampling, splitting, and training
-- **Hardware:** one NVIDIA H100 80GB GPU, 20 CPUs (Intel Xeon Platinum 8480+),
-  128 GB RAM
-- **Repeats:** 3 per run
-- **Preparation:** 3.5-6.5 minutes per subset
+**Time vs number of cells**
 
 .. figure:: /_static/demo/luca_runtime.svg
    :width: 100%
+   :alt: AE, VAE, and PCA training time against cell count at five latent dimensions.
 
-   Mean ± SD over three runs, one panel per latent dimension.
+   Total training time vs number of cells on LuCa slices, one panel per latent dimension; mean ± SD over 3 runs. 
 
-On the full dataset, PCA takes under a minute, nlscVI 22-26 minutes, and
-mlAE 12-45 minutes.
+.. dropdown:: Note: details on plots
+   :icon: info
+   :color: info
+
+   - **Models:** AE, VAE, and PCA
+   - **Latent dimensions:** 10, 32, 128, 512, and 2048 (where applicable)
+   - **Hidden width × depth:** 1024 × 1 (where applicable)
+   - **Data:** LuCA slices with 500, 1000, 10000, 100000, and 892296 cells
+   - **Hardware:**
+
+     - **GPU:** 1 × NVIDIA H100 80GB
+     - **CPU:** 20 × Intel Xeon Platinum 8480+
+     - **RAM:** 128 GB
+
+**Time vs TFLOPs**
+
+.. figure:: /_static/demo/time_vs_flops_per_epoch.svg
+   :width: 50%
+   :alt: AE and VAE training time per epoch against TFLOPs per epoch or fit.
+
+   Training time per epoch vs TFLOPs per epoch or fit on full LuCA; mean ± SD over 3 runs.
+   The broken logarithmic x-axis separates PCA from AE and VAE.
+
+.. dropdown:: Note: details on plot
+   :icon: info
+   :color: info
+
+   - **Models:** AE, VAE, and PCA
+   - **Latent dimension:** 2048
+   - **Hidden widths × depths:** 1024, 2048, 4096 × 1, 2, 4   
+   - **Data:** full LuCA with 892296 cells
+   - **Hardware:**
+
+     - **GPU:** 1 × NVIDIA H100 80GB
+     - **CPU:** 20 × Intel Xeon Platinum 8480+
+     - **RAM:** 128 GB
+
+   - **Time:**
+
+     - AE/VAE: wall time per epoch
+     - PCA: fit time
+
+   - **TFLOPs** (:math:`10^{12}` FLOPs):
+
+     - AE/VAE: train/val matrix operations per epoch, excluding optimizer steps, elementwise operations, and I/O
+     - PCA: estimated fit operations, excluding projection
+
+**TFLOPs vs width × depth**
+
+.. figure:: /_static/demo/flops_with_pca.png
+   :width: 100%
+   :alt: AE/VAE and PCA TFLOPs across architectures and latent dimensions.
+
+   TFLOPs across widths x depths and latent dimensions on full LuCA. AE/VAE: TFLOPs per training/validation epoch; dashed PCA: estimated TFLOPs per fit, excluding projection.
+
+
+.. _custom-data-e2e-time-estimates:
+
+**Estimated time per dataset**
+
+.. tab-set::
+
+   .. tab-item:: Average per run
+
+      .. csv-table:: Estimated compute cost averaged over configurations and splits, in hours
+         :file: average_time_estimates.csv
+         :header-rows: 1
+         :stub-columns: 1
+         :widths: 1, 1, 1, 1, 1, 1, 1, 1
+
+   .. tab-item:: Full benchmark
+
+      .. csv-table:: Estimated compute cost across all configurations and splits, in hours
+         :file: training_time_estimates.csv
+         :header-rows: 1
+         :stub-columns: 1
+         :widths: 1, 1, 1, 1, 1, 1, 1, 1
+
+.. dropdown:: Note: details on estimates
+   :icon: info
+   :color: info
+
+   - **Hidden widths × depths:** 1024, 2048, 4096 × 1-4
+   - **Latent dimensions:**
+
+     - AE, VAE, and PCA: 10, 32, 128, 512, and 2048
+     - MLP: the foundation model's embedding size
+
+   - **Data:** LuCA, PBMC, and Tahoe; 3 splits
+   - **Runs:** one configuration on each split; embeddings once per model and dataset
+   - **Hardware:**
+
+     - **GPU:** 1 × NVIDIA H100 80GB
+     - **CPU:** 20 × Intel Xeon Platinum 8480+
+     - **RAM:** 128 GB
+
+   - **Time:**
+
+     - AE, VAE, and MLP training
+     - PCA fit
+     - embedding extraction and combination
+   - **PBMC and Tahoe** are rough extrapolations of the LuCA timings

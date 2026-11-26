@@ -65,4 +65,4 @@ To run on a cluster with Slurm support, follow :doc:`the Slurm guide <custom_dat
    Data preparation <custom_datasets/dataset_preparation>
    custom_datasets/examples
    custom_datasets/advanced_usage
-   custom_datasets/slurm
+   Slurm <custom_datasets/slurm>

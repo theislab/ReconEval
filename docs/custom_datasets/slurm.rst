@@ -1,32 +1,34 @@
 .. _slurm-parameters:
 
-Run through Slurm (optional)
-----------------------------
+Slurm
+-----
 
 :doc:`Back to introduction <../custom_datasets>`
 
-Use these steps to submit any task's Python command as a cluster job.
-Complete the data and configuration steps for your task first.
-Skip this section for direct Python runs.
+Skip this section for a direct Python run.
 
-1. Create a ``.sbatch`` file starting with ``#!/bin/bash``, using a script
-   from ``experiments/*/submit/`` as a reference. Set the ``#SBATCH``
-   options for your cluster and workload: partition/account, time limit,
-   CPUs, memory, and GPUs if needed. Existing resource requests were
-   chosen for the benchmark datasets
+Finish the data and configuration steps first.
 
-2. Set the output and error log paths in the script, for example:
+Submit a task as a cluster job.
+
+**Follow the steps below:**
+
+1. **Resources**
+
+   Create a ``.sbatch`` file starting with ``#!/bin/bash``.
+   Set ``#SBATCH`` for your cluster: partition, account, time, CPUs, memory, and GPUs.
+
+2. **Logs**
 
    .. code-block:: bash
 
       #SBATCH --output=logs/slurm/%x-%j.out
       #SBATCH --error=logs/slurm/%x-%j.err
 
-   Place all ``#SBATCH`` directives before shell commands. Here ``%x``
-   is the job name and ``%j`` is the job ID
+   Put every ``#SBATCH`` line before any shell command.
+   ``%x`` is the job name. ``%j`` is the job ID.
 
-3. Initialize Conda, activate the environment specified in your task's
-   CLI instructions, and change to the repository directory:
+3. **Environment**
 
    .. code-block:: bash
 
@@ -34,30 +36,30 @@ Skip this section for direct Python runs.
       conda activate your-task-environment
       cd /path/to/ReconEval
 
-   Replace the paths and environment name with your local setup
+   Replace the paths and environment name with your local setup.
 
-4. Add the complete Python command from your task's CLI section:
-   :ref:`End-to-end <custom-data-e2e-cli>`,
-   :ref:`Foundation model reconstruction <custom-data-mlp-cli>`,
-   :ref:`STATE <custom-data-state-cli>`, or
-   :ref:`CellFlow <custom-data-cellflow-cli>`.
-   Set your input paths, output directory, and model options there.
-   When adapting an existing submission script, replace its training
-   command with your own
+4. **Command**
 
-5. Create the log directory **before** submission and submit from the
-   repository root:
+   - **Experiments**
+
+     - Instructions: :doc:`advanced usage <advanced_usage>`
+     - Code examples: ``experiments/*/submit/``
+
+   - **Demo**
+
+     - Instructions: :doc:`examples <examples>`
+     - Code examples: ``custom_datasets_demo/*/submit/``
+
+5. **Submit**
 
    .. code-block:: bash
 
       cd /path/to/ReconEval
       mkdir -p logs/slurm
-      sbatch /path/to/train_mydata.sbatch
+      sbatch /path/to/run_job.sbatch
 
-   Adjust the log directory to match your ``#SBATCH`` paths. The log
-   files contain the job's standard output and errors; model outputs
-   are saved at the locations described in each task's **Outputs** section
+   Create the log directory before ``sbatch``.
+   Results are saved where the task's **Outputs** section says.
 
-If you retain an existing script's environment-variable options, export
-only variables that the script reads and submit with ``sbatch --export=ALL``.
-Other settings belong in the Python command inside the script.
+If the script reads environment variables, submit with ``sbatch --export=ALL``.
+Other settings belong in the Python command.

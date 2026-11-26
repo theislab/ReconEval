@@ -10,7 +10,7 @@ see :doc:`Data preparation <../dataset_preparation>`.
 
 1. Choose a representation and width from the training script's ``EMB_DIMS``
    and prepare the corresponding embeddings (e.g. ``AE_128``)
-2. Provide the following files for STATE and CellFlow:
+2. Provide the following files for **STATE** and **CellFlow**:
 
 .. code-block:: text
 

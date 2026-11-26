@@ -22,7 +22,7 @@ For cluster submission, follow :ref:`Run through Slurm <slurm-parameters>`.
    training. Validation/test donor and cell-type labels must occur in the
    training categories
 
-4. Set the representation and output directory, then train CellFlow.
+4. Set the representation and output directory, then train **CellFlow**.
    For ``AE_128`` embeddings:
 
    .. code-block:: bash

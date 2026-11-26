@@ -5,7 +5,7 @@ Combine expression and embeddings
 
 :doc:`Back to Foundation model reconstruction <../foundation_model>`
 
-Prepare training and validation stores for the MLP decoder.
+Prepare training and validation stores for the **MLP** decoder.
 
 Configure
 ^^^^^^^^^

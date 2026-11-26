@@ -9,11 +9,11 @@ Outputs
   including the three best validation checkpoints, ``last.ckpt``, and
   ``final.ckpt``. The run name retains ``pbmc_split03`` even for custom
   data. An existing ``last.ckpt`` is used to resume training automatically
-- **CellFlow:** saves the best and last CellFlow model artifacts in the
+- **CellFlow:** saves the best and last **CellFlow** model artifacts in the
   directory specified by ``--out_dir``. The best model is selected using
   validation data
 
-Set ``--out_root`` for STATE and ``--out_dir`` for CellFlow to writable
+Set ``--out_root`` for **STATE** and ``--out_dir`` for **CellFlow** to writable
 paths, as in the CLI examples. Their defaults use cluster-specific paths;
 ``RECONEVAL_OUT`` does not redirect these outputs.
 

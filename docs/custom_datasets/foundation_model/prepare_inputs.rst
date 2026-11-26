@@ -60,6 +60,16 @@ Expression store includes:
 
 All groups must use the same gene columns in the same order.
 
+.. dropdown:: Note: Raw counts for Geneformer and UCE
+   :icon: info
+   :color: info
+
+   Geneformer and UCE take raw counts. Prepare a second store with the same
+   groups, ``obs_index`` order, genes, and ``.zattrs`` as
+   ``expression_for_fm.zarr``, with raw counts in ``<group>/X``.
+   With ``prepare_dataset.py``, add ``+save_counts=true`` to write it as
+   ``counts.zarr`` next to ``expression.zarr`` (the ``layer`` setting must point to raw counts).
+
 
 .. dropdown:: Examples: metadata files
    :color: primary
@@ -77,8 +87,8 @@ All groups must use the same gene columns in the same order.
               "var_ensembl_ids_38": ["ENSEMBL_ID_A", "ENSEMBL_ID_B"]
             }
 
-         The scConcept example uses ``var_ensembl_ids_38``; the other
-         examples use ``var_names``.
+         The **scConcept** and **Geneformer** examples use
+         ``var_ensembl_ids_38``; the other examples use ``var_names``.
 
       .. tab-item:: .zgroup
 
@@ -89,6 +99,34 @@ All groups must use the same gene columns in the same order.
             {
               "zarr_format": 2
             }
+
+**Add Ensembl IDs**
+
+In the ``reconeval`` environment, use the input dataset's gene annotations to
+add Ensembl IDs in expression-column order. Replace ``gene_name`` and
+``ensembl_id`` below with your ``.var`` column names; if Ensembl IDs are stored
+in ``.var_names``, use ``var.index`` instead of ``var["ensembl_id"]``.
+Each gene name must map to one Ensembl ID.
+
+.. code-block:: python
+
+   import h5py
+   import zarr
+   from anndata.io import read_elem
+
+   with h5py.File("/path/to/input.h5ad", "r") as source:
+       var = read_elem(source["var"])
+   gene_ids = dict(zip(var["gene_name"], var["ensembl_id"]))
+   expression = zarr.open("/path/to/mydata/expression_for_fm.zarr", mode="r+")
+   expression.attrs["var_ensembl_ids_38"] = [
+       gene_ids[gene].split(".")[0] for gene in expression.attrs["var_names"]
+   ]
+
+This removes version suffixes from Ensembl IDs. For both **scConcept** and
+**Geneformer**, set ``data_args.var_names_path`` to this expression store and
+``data_args.var_names_key`` to ``var_ensembl_ids_38``. **Geneformer** still reads
+raw counts from ``counts.zarr`` via ``data_args.comb_meta_root``; both stores
+must have the same gene columns in the same order.
 
 **Split metadata**
 
@@ -152,19 +190,35 @@ these stores:
    │       └── val.zarr/
    │           ├── X
    │           └── <embedding_key>
-   ├── all_genes.zarr/                # root var_names attribute
-   └── target_genes.zarr/             # root var_names attribute
+   └── expression_for_fm.zarr/        # reuse its root var_names attribute
 
 Replace ``<model>`` and ``<embedding_key>`` with ``SE``, ``scGPT``,
 ``scConcept``, ``scimilarity``, ``Geneformer``, ``UCE``, or ``scFoundation``.
 
-- ``all_genes.zarr.attrs["var_names"]``: all expression genes in ``X`` column order
-- ``target_genes.zarr.attrs["var_names"]``: selected genes in decoder output order
+The ``--all-genes-zarr`` and ``--target-genes-zarr`` arguments read only the
+root ``var_names`` attribute. When reconstructing the same genes, pass the
+expression store used in the combination step for both arguments
+(``expression_for_fm.zarr`` here, or ``expression.zarr`` in the demo).
+Its gene list must match the ``X`` column order in both combined stores.
+
+To reconstruct a subset, create a metadata-only store listing the desired
+genes in decoder-output order:
+
+.. code-block:: python
+
+   import zarr
+
+   target = zarr.open_group("/path/to/mydata/target_genes.zarr", mode="a")
+   target.attrs["var_names"] = ["GENE_A", "GENE_B"]  # replace with your genes
+
+Pass this store as ``--target-genes-zarr`` and keep ``--all-genes-zarr`` pointing
+to the expression store. Every target gene must exist in its ``var_names``.
+Evaluation expression must use the same target genes in the same order.
 
 Reference PCA
 ^^^^^^^^^^^^^
 
-Reuse a reference PCA or fit a new one; see :doc:`reference PCA <reference_pca>`.
+Reuse a reference **PCA** or fit a new one; see :doc:`reference PCA <reference_pca>`.
 
 Evaluation
 ^^^^^^^^^^

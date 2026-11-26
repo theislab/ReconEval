@@ -111,14 +111,16 @@ Set parameters in YAML or pass ``key=value`` overrides on the CLI.
 
 .. _custom-data-e2e-pca-setup:
 
-.. dropdown:: Note: hardcoded temporary directory
+.. dropdown:: Note: PCA temporary directory
    :icon: info
    :color: info
 
-   Before running PCA, replace the default ``temp_dir`` in
-   ``ReconPCA._setup_cluster``
-   (``src/sc_reconstruction/models/reconpca.py``) with a writable
-   directory for temporary files on your machine.
+   PCA uses the system temporary directory by default. To choose a different
+   writable directory, add this override to the training command:
+
+   .. code-block:: bash
+
+      trainer.temp_dir=/path/to/writable/tmp
 
 .. _custom-data-e2e-cli:
 
@@ -138,10 +140,12 @@ For example, train a ``<model>`` with your ``mydata.yaml`` configuration:
 
 .. code-block:: bash
 
+   # e.g. for AE: model="train/AE" trainer="AE"
    python experiments/01_end_to_end/codes/train.py \
-     model="train/<model>" \ #e.g. for AE: train/AE
-     trainer="<trainer>" \ #e.g. for AE: AE
-     data=mydata
+     model="train/<model>" \
+     trainer="<trainer>" \
+     data=mydata \
+     +model.logging.wandb.offline=true #AE and VAE log to Weights & Biases; offline saves logs locally
 
 **Alternatively, you can use command-line overrides**
 
@@ -150,12 +154,14 @@ for an individual run:
 
 .. code-block:: bash
 
+   # e.g. for AE: model="train/AE" trainer="AE"
    python experiments/01_end_to_end/codes/train.py \
-     model="train/<model>" \ #e.g. for AE: train/AE
-     trainer="<trainer>" \ #e.g. for AE: AE
+     model="train/<model>" \
+     trainer="<trainer>" \
      data=mydata \
      data.name=mydata_new \
-     data.path=/path/to/mydata_new
+     data.path=/path/to/mydata_new \
+     +model.logging.wandb.offline=true #AE and VAE log to Weights & Biases; offline saves logs locally
 
 .. _custom-data-e2e-train-outputs:
 

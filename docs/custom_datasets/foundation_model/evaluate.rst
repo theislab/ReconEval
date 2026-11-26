@@ -27,14 +27,14 @@ Configure
 ^^^^^^^^^
 
 The evaluation scripts use three main YAML configurations (data, metric,
-decoder), and a reference PCA YAML for distributional evaluation:
+decoder), and a reference **PCA** YAML for distributional evaluation:
 
 - Reuse your :ref:`data YAML <custom-data-fm-evaluation-config>`
 - Choose a metric and update its YAML under
   ``experiments/02_foundation_model/configs/metric/`` using the settings below
 - Update ``experiments/02_foundation_model/configs/decoder/MLP.yaml``
   to match your trained decoder
-- Create a reference PCA YAML under
+- Create a reference **PCA** YAML under
   ``experiments/02_foundation_model/configs/metric/projector/``
 
 **Metric evaluation YAML details**
@@ -118,7 +118,7 @@ Create ``experiments/02_foundation_model/configs/metric/projector/PCA.yaml``:
 
 - Use the exact paths to the saved mean and components; see :ref:`reference-PCA outputs <custom-data-e2e-reference-pca>`.
 - ``mydata`` must match ``data.name``
-- ``n_components`` must match the saved PCA
+- ``n_components`` must match the saved **PCA**
 - ``model_data`` defaults to ``data.name`` (``mydata`` in this example)
 
 **Parameters**

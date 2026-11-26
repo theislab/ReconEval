@@ -27,14 +27,14 @@ For details, see `Metric families <../../overview.html#metric-families>`_ and th
 Configure
 ^^^^^^^^^
 
-The evaluation scripts use three main YAML configurations (data, metric, model), and a reference PCA YAML for distributional evaluation:
+The evaluation scripts use three main YAML configurations (data, metric, model), and a reference **PCA** YAML for distributional evaluation:
 
 - Reuse your :ref:`data YAML <custom-data-e2e-data-config>`
 - Choose a metric and use its prepared YAML from
   ``experiments/01_end_to_end/configs/metric/``
 - Create a YAML for your trained model under
   ``experiments/01_end_to_end/configs/model/eval/``
-- Create a reference PCA YAML under
+- Create a reference **PCA** YAML under
   ``experiments/01_end_to_end/configs/metric/projector/``
 
 **Model evaluation YAML details**
@@ -43,7 +43,7 @@ The evaluation scripts use three main YAML configurations (data, metric, model),
 
    .. tab-item:: AE/VAE
 
-      Example for an AE or VAE variant (``model/eval/<model>.yaml``):
+      Example for an **AE** or **VAE** variant (``model/eval/<model>.yaml``):
 
       .. code-block:: yaml
 
@@ -62,7 +62,7 @@ The evaluation scripts use three main YAML configurations (data, metric, model),
 
    .. tab-item:: PCA
 
-      Example for PCA (``model/eval/PCA.yaml``):
+      Example for **PCA** (``model/eval/PCA.yaml``):
 
       .. code-block:: yaml
 
@@ -100,7 +100,7 @@ Create ``experiments/01_end_to_end/configs/metric/projector/PCA.yaml``:
 
 - Use the exact paths to the saved mean and components; see :ref:`reference-PCA outputs <custom-data-e2e-reference-pca>`.
 - ``mydata`` must match ``data.name``
-- ``n_components`` must match the saved PCA
+- ``n_components`` must match the saved **PCA**
 - ``model_data`` defaults to ``data.name`` (``mydata`` in this example)
 
 **Parameters**
@@ -128,6 +128,7 @@ Set the parameters in YAML or pass them as ``key=value`` on the CLI:
             "``model``", "Required", "Evaluation configuration: ``eval/<model>``"
             "``metric``", "Required", "Selected metric configuration"
             "``dynamic_model_loading``", "Optional; default: ``true``", "``load.additional_params`` applies only when this is ``true`` and ``model_args`` is absent"
+            "``+legacy_mlae_forward=false``", "Required for newly trained mlAE checkpoints", "Disable the legacy mlAE forward adaptation; preserve the forward implementation used during training"
             "``train_fraction``", "Required for held-out-only evaluation", "Set to ``0`` to exclude training groups; current default: ``0.1``"
             "``test_fraction``", "Optional; default: ``1``", "Fraction of held-out groups to evaluate"
             "``seed``", "Optional; default: ``42``", "Group-sampling seed"
@@ -218,6 +219,7 @@ Example:
      data=mydata \
      metric=_distributional \
      model="eval/<model>" \
+     +legacy_mlae_forward=false \
      metric.evaluator.mode=reconstruction \
      metric.evaluator.emb_zarr_path=null \
      train_fraction=0 \
@@ -246,6 +248,7 @@ Example:
      metric.evaluator.mode=reconstruction \
      metric.evaluator.emb_zarr_path=null \
      model="eval/<model>" \
+     +legacy_mlae_forward=false \
      train_fraction=0 \
      test_fraction=1 \
      split="split0X" \

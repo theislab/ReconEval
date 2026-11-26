@@ -3,11 +3,11 @@ Foundation model reconstruction
 
 :doc:`Back to examples <../examples>`
 
-This example runs the foundation model workflow with SE on 500 cells and
+This example runs the foundation model workflow with **SE** on 500 cells and
 500 genes from the LuCA dataset.
 
-The Slurm scripts also run scGPT, scConcept, SCimilarity, Geneformer, UCE,
-and scFoundation.
+The Slurm scripts also run **scGPT**, **scConcept**, **SCimilarity**, **Geneformer**, **UCE**,
+and **scFoundation**.
 
 How to run
 ----------
@@ -24,7 +24,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
 
          conda activate <reconeval-state | reconeval>
 
-      - ``<reconeval-state | reconeval>``: use ``reconeval-state`` for SE embedding
+      - ``<reconeval-state | reconeval>``: use ``reconeval-state`` for **SE** embedding
         extraction and ``reconeval`` for all other steps. Other models extract
         embeddings in ``reconeval-<model>``, e.g. ``reconeval-geneformer``.
 
@@ -46,6 +46,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
 
          [SLURM HEADERS]
 
+         image=/path/to/reconeval-all.sif
          [PATHS AND APPTAINER SETUP]
 
          CMD=$(cat <<'COMMAND'
@@ -56,7 +57,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
          mkdir -p results/luca-demo/tmp
          apptainer exec [APPTAINER OPTIONS] \
              --env TMPDIR=/work/results/luca-demo/tmp \
-             /path/to/reconeval-all.sif \
+             "$image" \
              conda run --no-capture-output -n <reconeval-state | reconeval> \
              bash -e -c "$CMD"
 
@@ -86,7 +87,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
            - ``--pwd /work``: set the working directory
            - ``--nv``: enable NVIDIA GPU access
 
-         - ``/path/to/reconeval-all.sif``: absolute path to your Apptainer image
+         - ``/path/to/reconeval-all.sif``: path to your Apptainer image; set it in each script
          - ``[SLURM SCRIPT]``: the path to the ``.sbatch`` file for the step,
            e.g. ``custom_datasets_demo/02_foundation_model/submit/train.sbatch``
 
@@ -115,7 +116,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
 
       Replace:
 
-      - ``<reconeval-state | reconeval>`` with ``reconeval-state`` for SE embedding
+      - ``<reconeval-state | reconeval>`` with ``reconeval-state`` for **SE** embedding
         extraction and ``reconeval`` for all other steps.
       - ``[PYTHON COMMAND]`` with one full command from the **Direct** tab of the relevant step
       - ``/path/to/reconeval-all.sif`` with the absolute path to your image
@@ -145,7 +146,7 @@ Run from the repository root. Containers use the same paths as **Direct**.
 
       Replace:
 
-      - ``<reconeval-state | reconeval>`` with ``reconeval-state`` for SE embedding
+      - ``<reconeval-state | reconeval>`` with ``reconeval-state`` for **SE** embedding
         extraction and ``reconeval`` for all other steps.
       - ``[PYTHON COMMAND]`` with the full command from the **Direct** tab of the relevant step
       - ``reconeval:latest`` with the name and tag of your Docker image
@@ -210,7 +211,7 @@ The full pipeline from **Direct** tabs:
        pretrained=SE \
        decoder=MLP \
        metric=decode_statistical_demo \
-       "decoder.load.path='results/luca-demo/fm/SE/MLP/<checkpoint>'" \
+       "decoder.load.path='results/luca-demo/fm/SE/MLP/<checkpoint>.ckpt'" \
        'metric.projector.load.path=[results/luca-demo/reference-pca/mean.zarr,results/luca-demo/reference-pca/pc_50.zarr]' \
        output.save_path=results/luca-demo/fm/SE/distributional.csv
 
@@ -219,12 +220,13 @@ The full pipeline from **Direct** tabs:
 
 Prepare the dataset and convert the expression store as described in the
 :ref:`end-to-end prerequisites <end-to-end-prerequisites>`.
-Reuse ``data/luca/demo/`` if those steps are already complete.
+Reuse ``data/luca/demo/`` if those steps are already complete
+(rerun with ``+save_counts=true`` if ``counts.zarr`` is missing).
 
 1. Prepare checkpoints
 ----------------------
 
-Download SE, scGPT, scConcept, SCimilarity, Geneformer, UCE, and scFoundation
+Download **SE**, **scGPT**, **scConcept**, **SCimilarity**, **Geneformer**, **UCE**, and **scFoundation**
 checkpoints:
 
 .. tab-set::
@@ -282,7 +284,7 @@ checkpoints:
 
 **Extract embeddings**
 
-Run SE on all demo groups for decoder training and evaluation.
+Run **SE** on all demo groups for decoder training and evaluation.
 
 .. tab-set::
 
@@ -321,7 +323,7 @@ Run SE on all demo groups for decoder training and evaluation.
              --bind "$PWD:/work" \
              --bind "$(realpath results):$(realpath results)" \
              --bind "$(realpath data):$(readlink data)" \
-             --bind "$(realpath checkpoints/pretrained):$(readlink checkpoints/pretrained):ro" \
+             --bind "$(realpath checkpoints/pretrained):$(readlink checkpoints/pretrained)" \
              --pwd /work \
              /path/to/reconeval-all.sif \
              conda run --no-capture-output -n reconeval-state [PYTHON COMMAND]
@@ -336,16 +338,16 @@ Run SE on all demo groups for decoder training and evaluation.
              -v "$PWD:/work" \
              -v "$(realpath results):$(realpath results)" \
              -v "$(realpath data):$(readlink data)" \
-             -v "$(realpath checkpoints/pretrained):$(readlink checkpoints/pretrained):ro" \
+             -v "$(realpath checkpoints/pretrained):$(readlink checkpoints/pretrained)" \
              -w /work \
              reconeval:latest \
              -n reconeval-state [PYTHON COMMAND]
 
 **Outputs:** ``data/luca/demo/embeddings/SE/grouped.zarr``
 
-Geneformer and UCE take raw counts: the Slurm script first writes
-``data/luca/demo/counts.zarr`` from the ``count`` layer of the source h5ad,
-with the same groups, cells, and genes as ``expression.zarr``.
+**Geneformer** and **UCE** take raw counts from ``data/luca/demo/counts.zarr``,
+written by ``prepare_dataset.py`` with ``+save_counts=true``
+(see the end-to-end prerequisites).
 
 For configuration details see
 :doc:`Extract embeddings <../foundation_model/extract_embeddings>`.
@@ -417,7 +419,7 @@ For configuration details see
 3. Train MLP decoder
 --------------------
 
-Train a one-layer MLP decoder.
+Train a one-layer **MLP** decoder.
 
 .. tab-set::
 
@@ -481,7 +483,7 @@ For configuration details see :doc:`Train <../foundation_model/train>`.
 4. Reference PCA
 ----------------
 
-Reuse the reference PCA if available, or follow the
+Reuse the reference **PCA** if available, or follow the
 :ref:`end-to-end instructions <end-to-end-reference-pca>` to fit it.
 
 
@@ -494,7 +496,7 @@ Reconstruct held-out expression and compute distributional metrics.
 
    .. tab-item:: Direct
 
-      Set ``<checkpoint>`` to your decoder checkpoint filename:
+      Set ``<checkpoint>.ckpt`` to your decoder checkpoint filename:
 
       **Distributional metrics**
 
@@ -508,7 +510,7 @@ Reconstruct held-out expression and compute distributional metrics.
              pretrained=SE \
              decoder=MLP \
              metric=decode_statistical_demo \
-             "decoder.load.path='results/luca-demo/fm/SE/MLP/<checkpoint>'" \
+             "decoder.load.path='results/luca-demo/fm/SE/MLP/<checkpoint>.ckpt'" \
              'metric.projector.load.path=[results/luca-demo/reference-pca/mean.zarr,results/luca-demo/reference-pca/pc_50.zarr]' \
              output.save_path=results/luca-demo/fm/SE/distributional.csv
 
@@ -558,7 +560,8 @@ For configuration details see :doc:`Evaluate <../foundation_model/evaluate>`.
 6. Summarize metrics
 --------------------
 
-After evaluating all seven models:
+After evaluating all seven models (the Slurm scripts run all of them; the
+**Direct** commands show **SE** only):
 
 .. tab-set::
 
@@ -597,7 +600,7 @@ After evaluating all seven models:
 
 **Outputs:** ``results/luca-demo/fm/summary.csv``
 
-Means across test groups. Higher R² and lower other metrics are better.
+Means across test groups. Higher :math:`R^2` and lower other metrics are better.
 
 .. csv-table::
    :file: foundation_model_summary.csv
@@ -609,25 +612,69 @@ Model performance may be limited by the small demo split.
 Runtime
 -------
 
-Embedding extraction and MLP decoder training time on LuCA subsets:
-
-- **Models:** SE, scGPT, scConcept, and SCimilarity
-- **Embedding dimensions:** 2,058 (SE), 512 (scGPT, scConcept), 128 (SCimilarity)
-- **Decoder:** 1 hidden layer of 1,024, 2,048, or 4,096 units, up to 500
-  epochs with early stopping
-- **Data:** 500, 1,000, 10,000, 100,000, and 892,296 cells; 5,983 HVGs
-- **Split:** 70/15/15 train/val/test split by combination per subset
-- **Seed:** 42 for cell subsampling, splitting, and decoder training
-- **Hardware:** one NVIDIA H100 80GB GPU, 20 CPUs (Intel Xeon Platinum 8480+),
-  128 GB RAM
-- **Repeats:** 3 per run
+**Time vs number of cells**
 
 .. figure:: /_static/demo/luca_runtime_fm.svg
    :width: 100%
+   :alt: Embedding extraction and decoder training time vs cell count for seven foundation models.
 
-   Mean ± SD over three runs. Left: embedding extraction; other panels:
-   decoder training per model and hidden size.
+   Embedding extraction and decoder training time vs number of cells on LuCA slices.
+   First panel: embedding extraction; remaining panels: MLP on each model's embeddings.
+   Mean ± SD over 3 runs.
 
-On the full dataset, embedding extraction takes 7 minutes (SCimilarity),
-9 minutes (scConcept), 31 minutes (scGPT), and 2.3 hours (SE); decoder
-training takes 11-27 minutes.
+.. dropdown:: Note: details on plots
+   :icon: info
+   :color: info
+
+   - **Models:**
+
+     - **Embedding extraction:** SCimilarity, scGPT, scConcept, Geneformer, UCE, SE,
+       and scFoundation
+     - **Decoder training:** MLP on each model's embeddings
+
+   - **Embedding dimensions:** 128 (SCimilarity), 512 (scGPT, scConcept),
+     1152 (Geneformer), 1280 (UCE), 2058 (SE), and 3072 (scFoundation)
+   - **Hidden widths × depth:** 1024, 2048, 4096 × 1
+   - **Data:** LuCA slices with 500, 1000, 10000, 100000, and 892296 cells
+   - **Hardware:**
+
+     - **GPU:** 1 × NVIDIA H100 80GB
+     - **CPU:** 20 × Intel Xeon Platinum 8480+
+     - **RAM:** 128 GB
+
+**Decoder time and TFLOPs**
+
+.. figure:: /_static/demo/decoder_flops_with_se_runtime.svg
+   :width: 100%
+   :alt: MLP decoder training time per epoch and decoder TFLOPs across architectures for seven foundation models.
+
+   First panel: MLP training time per epoch vs TFLOPs per epoch on SE embeddings; mean ± SD over 3 runs.
+   Remaining panels: MLP TFLOPs per epoch vs width × depth, one panel per foundation model.
+   On the full LuCA dataset.
+
+.. dropdown:: Note: details on plots
+   :icon: info
+   :color: info
+
+   - **Models:**
+
+     - **Runtime:** MLP on SE embeddings
+     - **TFLOPs:** MLP on each foundation model's embeddings
+
+   - **Hidden widths × depths:** 1024, 2048, 4096 × 1, 2, 4 for the runtime MLP;
+     depths 1–4 for TFLOPs
+   - **Embedding dimensions:** 2058 for the MLP runtime; each model's own dimension
+   - **Data:** full LuCA with 892296 cells
+   - **Hardware:**
+
+     - **GPU:** 1 × NVIDIA H100 80GB
+     - **CPU:** 20 × Intel Xeon Platinum 8480+
+     - **RAM:** 128 GB
+
+   - **Time:** MLP decoder wall time per epoch
+   - **TFLOPs** (:math:`10^{12}` FLOPs): train/val matrix operations per epoch,
+     excluding embedding extraction, optimizer steps, elementwise operations, and I/O
+
+**Estimated time per dataset**
+
+See :ref:`Estimated time per dataset <custom-data-e2e-time-estimates>`.

@@ -54,7 +54,7 @@ General data configuration:
             :header: "Parameter", "Required / optional", "Value / meaning"
             :widths: 35, 20, 45
 
-            "``data_args.comb_meta_root``", "Required for custom data", "Expression store containing ``<group>/X``"
+            "``data_args.comb_meta_root``", "Required for custom data", "Log1p-normalized expression store containing ``<group>/X``"
             "``data_args.split_meta_root``", "Required for custom data", "Store whose root attributes contain the group-name lists"
             "``data_args.output_dir``", "Required for custom output", "Output store receiving embeddings under ``<group>/X``"
             "``data_args.target_key``", "Required for split selection", "``null`` combines ``train_combinations``, ``val_combinations``, and ``test_combinations``; use one of these names to select a single split"
@@ -67,7 +67,7 @@ General data configuration:
             :header: "Parameter", "Required / optional", "Value / meaning"
             :widths: 35, 20, 45
 
-            "``data_args.comb_meta_root``", "Required for custom data", "Expression store containing ``<group>/X``"
+            "``data_args.comb_meta_root``", "Required for custom data", "Log1p-normalized expression store containing ``<group>/X``"
             "``data_args.split_meta_root``", "Required for custom data", "Store whose root attributes contain the group-name lists"
             "``data_args.output_dir``", "Required for custom output", "Output store receiving embeddings under ``<group>/X``"
             "``data_args.target_key``", "Required for split selection", "``null`` combines ``train_combinations``, ``val_combinations``, and ``test_combinations``; use one of these names to select a single split"
@@ -82,7 +82,7 @@ General data configuration:
             :header: "Parameter", "Required / optional", "Value / meaning"
             :widths: 35, 20, 45
 
-            "``data_args.comb_meta_root``", "Required for custom data", "Expression store containing ``<group>/X``"
+            "``data_args.comb_meta_root``", "Required for custom data", "Log1p-normalized expression store containing ``<group>/X``"
             "``data_args.split_meta_root``", "Required for custom data", "Store whose root attributes contain the group-name lists"
             "``data_args.output_dir``", "Required for custom output", "Output store receiving embeddings under ``<group>/X``"
             "``data_args.target_key``", "Required for split selection", "``null`` combines ``train_combinations``, ``val_combinations``, and ``test_combinations``; use one of these names to select a single split"
@@ -97,7 +97,52 @@ General data configuration:
             :header: "Parameter", "Required / optional", "Value / meaning"
             :widths: 35, 20, 45
 
-            "``data_args.comb_meta_root``", "Required for custom data", "Expression store containing ``<group>/X``"
+            "``data_args.comb_meta_root``", "Required for custom data", "Raw-count or log1p-normalized expression store containing ``<group>/X``; normalized internally"
+            "``data_args.split_meta_root``", "Required for custom data", "Store whose root attributes contain the group-name lists"
+            "``data_args.output_dir``", "Required for custom output", "Output store receiving embeddings under ``<group>/X``"
+            "``data_args.target_key``", "Required for split selection", "``null`` combines ``train_combinations``, ``val_combinations``, and ``test_combinations``; use one of these names to select a single split"
+            "``data_args.var_names_path``", "Required for custom data", "Store containing gene identifiers in its root attributes; use ``/path/to/mydata/expression_for_fm.zarr``"
+            "``data_args.var_names_key``", "Optional; keep if unchanged", "Gene attribute to read; supplied value: ``var_names``"
+
+      .. tab-item:: Geneformer
+
+         YAML: ``experiments/02_foundation_model/configs/pretrained/Geneformer.yaml``
+
+         .. csv-table::
+            :header: "Parameter", "Required / optional", "Value / meaning"
+            :widths: 35, 20, 45
+
+            "``data_args.comb_meta_root``", "Required for custom data", "Raw-count store containing ``<group>/X``"
+            "``data_args.split_meta_root``", "Required for custom data", "Store whose root attributes contain the group-name lists"
+            "``data_args.output_dir``", "Required for custom output", "Output store receiving embeddings under ``<group>/X``"
+            "``data_args.target_key``", "Required for split selection", "``null`` combines ``train_combinations``, ``val_combinations``, and ``test_combinations``; use one of these names to select a single split"
+            "``data_args.var_names_path``", "Required for custom data", "Store containing gene identifiers in its root attributes"
+            "``data_args.var_names_key``", "Optional; keep if unchanged", "Gene attribute to read; supplied value: ``var_ensembl_ids_38``"
+
+      .. tab-item:: UCE
+
+         YAML: ``experiments/02_foundation_model/configs/pretrained/UCE.yaml``
+
+         .. csv-table::
+            :header: "Parameter", "Required / optional", "Value / meaning"
+            :widths: 35, 20, 45
+
+            "``data_args.comb_meta_root``", "Required for custom data", "Raw-count store containing ``<group>/X``"
+            "``data_args.split_meta_root``", "Required for custom data", "Store whose root attributes contain the group-name lists"
+            "``data_args.output_dir``", "Required for custom output", "Output store receiving embeddings under ``<group>/X``"
+            "``data_args.target_key``", "Required for split selection", "``null`` combines ``train_combinations``, ``val_combinations``, and ``test_combinations``; use one of these names to select a single split"
+            "``data_args.var_names_path``", "Required for custom data", "Store containing gene identifiers in its root attributes"
+            "``data_args.var_names_key``", "Optional; keep if unchanged", "Gene attribute to read; supplied value: ``var_names``"
+
+      .. tab-item:: scFoundation
+
+         YAML: ``experiments/02_foundation_model/configs/pretrained/scFoundation.yaml``
+
+         .. csv-table::
+            :header: "Parameter", "Required / optional", "Value / meaning"
+            :widths: 35, 20, 45
+
+            "``data_args.comb_meta_root``", "Required for custom data", "Log1p-normalized expression store containing ``<group>/X``"
             "``data_args.split_meta_root``", "Required for custom data", "Store whose root attributes contain the group-name lists"
             "``data_args.output_dir``", "Required for custom output", "Output store receiving embeddings under ``<group>/X``"
             "``data_args.target_key``", "Required for split selection", "``null`` combines ``train_combinations``, ``val_combinations``, and ``test_combinations``; use one of these names to select a single split"
@@ -122,9 +167,12 @@ No YAML configuration is needed.
 
       "``--emb-train-zarr``", "Required", "Training store containing ``X`` and embeddings: ``/path/to/mydata/embeddings/<model>/train.zarr``"
       "``--emb-val-zarr``", "Required", "Validation store containing ``X`` and embeddings: ``/path/to/mydata/embeddings/<model>/val.zarr``"
-      "``--all-genes-zarr``", "Required", "Gene-list store whose root ``var_names`` attribute lists expression genes in column order: ``/path/to/mydata/all_genes.zarr``"
-      "``--target-genes-zarr``", "Required", "Gene-list store whose root ``var_names`` attribute lists all or selected expression genes in decoder output order: ``/path/to/mydata/target_genes.zarr``"
+      "``--all-genes-zarr``", "Required", "Store whose root ``var_names`` lists expression genes in column order; reuse ``/path/to/mydata/expression_for_fm.zarr``"
+      "``--target-genes-zarr``", "Required", "Store whose root ``var_names`` lists genes in decoder output order; reuse the same expression store for all genes, or create a gene-list store for a subset"
       "``--embedding-key``", "Required", "Embedding array name in both stores: ``SE``, ``scGPT``, ``scConcept``, ``scimilarity``, ``Geneformer``, ``UCE``, or ``scFoundation``"
+
+See :ref:`decoder training inputs <custom-data-fm-decoder-training-inputs>`
+for the gene-list preparation example.
 
 .. _custom-data-fm-evaluation-config:
 

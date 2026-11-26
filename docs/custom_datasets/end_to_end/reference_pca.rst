@@ -5,7 +5,7 @@ Prepare reference PCA
 
 :doc:`Back to End-to-end reconstruction <../end_to_end>`
 
-For distributional evaluation, reuse a matching reference PCA or fit one
+For distributional evaluation, reuse a matching reference **PCA** or fit one
 using the :ref:`reference expression <custom-data-e2e-reference-pca-inputs>`
 and :ref:`dataset configuration <custom-data-e2e-data-config>`.
 
@@ -14,7 +14,7 @@ run from the repository root in GPU-enabled ``reconeval``, directly
 or through :ref:`Slurm <slurm-parameters>`.
 
 The example fits 50 components. Replace ``<output_root>`` with the absolute
-path to your :ref:`output directory <custom-data-e2e-model-files>`:
+path to your :ref:`output directory <custom-data-e2e-train-outputs>`:
 
 .. code-block:: bash
 
