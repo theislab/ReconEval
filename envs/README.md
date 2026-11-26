@@ -1,6 +1,6 @@
 # envs/
 
-Reproducible conda environment files for each runtime in the ReconEval
+Conda environment recipes and pip requirements for each runtime in the ReconEval
 benchmark. Foundation models ship mutually-incompatible dep stacks
 (different torch / CUDA / flash-attn combos), so each FM gets its own
 env.
@@ -12,6 +12,9 @@ env.
 | `scgpt.yaml` | scGPT FM embed | `02_foundation_model/codes/scGPT_emb.py` |
 | `scconcept_env.yaml` | scConcept FM embed + Transformer decoder | `02_foundation_model/codes/scConcept_emb.py`, `decoderonly_hvg_tsfm.py` |
 | `scimilarity_env.yaml` | SCimilarity FM embed | `02_foundation_model/codes/scimilarity_emb.py` |
+| `geneformer.txt` | Geneformer FM embed, Python 3.10 | `02_foundation_model/codes/Geneformer_emb.py` |
+| `uce.txt` | UCE FM embed, Python 3.10 | `02_foundation_model/codes/UCE_emb.py` |
+| `scfoundation.txt` | scFoundation FM embed, Python 3.10 | `02_foundation_model/codes/scFoundation_emb.py` |
 | `pancellflow.yaml` | CellFlow training + eval (JAX) | `03_latent_shift/codes/train_cf.py`, `eval_cf.py` |
 | `requirements-min.txt` | Metrics + tutorials only — no torch / FMs, pip-only | `tutorials/metrics.ipynb` |
 
@@ -35,6 +38,11 @@ conda env create -f envs/pancellflow.yaml
 ```
 
 ## Provenance
+
+Docker uses the Geneformer, UCE and scFoundation TXT files for their Python 3.10
+environments. [docker/setup.sh](../docker/setup.sh) installs these dependencies
+and ReconEval, then adds the model code. See the
+[container instructions](../docker/README.md).
 
 Each yaml was derived from a `pip list` of the corresponding live
 environment on the IT-CB cluster (snapshot date 2026-06-08), narrowed to

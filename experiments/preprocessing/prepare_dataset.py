@@ -3,11 +3,13 @@ import os
 import re
 import gc
 import time
+import warnings
 
 import numpy as np
 import zarr
 import scanpy as sc
 import dask.array as da
+from scipy.sparse import issparse
 from tqdm import tqdm
 from dask.diagnostics import ProgressBar
 from sklearn.model_selection import train_test_split
@@ -51,7 +53,7 @@ def process_adata(adata, normalize=True, target_sum=1e4, log1p=True):
 
 def select_hvg(adata, hvg):
     if hvg.method == 'precomputed':
-        mask = adata.var[hvg.column] == 'True'
+        mask = adata.var[hvg.column].isin([True, 'True'])
     elif hvg.method == 'dispersion':
         sc.pp.highly_variable_genes(adata, min_mean=hvg.min_mean,
                                     max_mean=hvg.max_mean, min_disp=hvg.min_disp)
@@ -63,8 +65,15 @@ def select_hvg(adata, hvg):
         raise ValueError(f"Unknown hvg.method: {hvg.method!r}. Choose precomputed, dispersion, or n_top_genes.")
     return adata[:, mask]
 
-def prepare_dataset(adata, hvg):
-    adata = process_adata(adata)
+def prepare_dataset(adata, hvg, normalize=True, log1p=True):
+    if not (normalize and log1p) and hvg.method != 'precomputed':
+        warnings.warn(
+            f"normalize/log1p are off, so hvg.method={hvg.method!r} runs on .X as given; "
+            "if .X holds raw counts, genes may differ from a normalized run. "
+            "Use hvg.method: precomputed to keep the same genes.",
+            UserWarning,
+        )
+    adata = process_adata(adata, normalize=normalize, log1p=log1p)
     adata = select_hvg(adata, hvg)
     adata.obs['cell_id'] = adata.obs.index.astype(str)
     adata.obs.reset_index(drop=True, inplace=True)
@@ -79,7 +88,8 @@ def create_comb_key(adata, columns=('cell_type', 'dataset', 'origin')):
     )
     return adata
 
-def write_comb_to_zarr(adata, output_dir, var_names_col=None):
+def write_comb_to_zarr(adata, output_dir, var_names_col=None, layer=None):
+    X = adata.layers[layer] if layer else adata.X
     os.makedirs(output_dir, exist_ok=True)
     root_zarr = zarr.open(output_dir, mode='a')
     var_names = adata.var[var_names_col].tolist() if var_names_col else adata.var_names.tolist()
@@ -89,8 +99,10 @@ def write_comb_to_zarr(adata, output_dir, var_names_col=None):
     for comb_key, row_positions in tqdm(adata.obs.groupby('comb_key').indices.items()):
         group = adata.obs.iloc[row_positions]
         current_combinations.add(comb_key)
-        x_group = adata.X[row_positions].toarray()
-        da.from_array(x_group, chunks=-1).astype(adata.X.dtype).to_zarr(
+        x_group = X[row_positions]
+        if issparse(x_group):
+            x_group = x_group.toarray()
+        da.from_array(x_group, chunks=-1).astype(X.dtype).to_zarr(
             output_dir + '/' + comb_key, component='X', overwrite=True)
         da.from_array(group['cell_id'].values, chunks=-1).astype('<U40').to_zarr(
             output_dir + '/' + comb_key, component='obs_index', overwrite=True)
@@ -199,7 +211,11 @@ def main(cfg: DictConfig) -> None:
     if utils and hasattr(utils, 'pre_proc'):
         adata = utils.pre_proc(adata, cfg)
 
-    adata = prepare_dataset(adata, cfg.hvg)
+    save_counts = cfg.get('save_counts', False)
+    if save_counts:
+        adata.layers['raw_counts'] = adata.X.copy()
+
+    adata = prepare_dataset(adata, cfg.hvg, cfg.get('normalize', True), cfg.get('log1p', True))
 
     if cfg.get('demo', False):
         adata = demo_subsample(adata, cfg.get('demo_cells', 500),
@@ -210,6 +226,12 @@ def main(cfg: DictConfig) -> None:
 
     if utils and hasattr(utils, 'post_proc'):
         utils.post_proc(expression_dir, cfg)
+
+    if save_counts:
+        counts_dir = os.path.join(cfg.output, 'counts.zarr')
+        write_comb_to_zarr(adata, counts_dir, cfg.var_names_col, layer='raw_counts')
+        if utils and hasattr(utils, 'post_proc'):
+            utils.post_proc(counts_dir, cfg)
 
     splits = prepare_splits(expression_dir, cfg.split, cfg.columns, cfg.seed)
     write_split_metadata_to_zarr(splits, cfg.output, seed=cfg.seed)
