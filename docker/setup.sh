@@ -25,13 +25,22 @@ fi
 
 # Installation
 if [[ "$recipe" == *.txt ]]; then
-    conda create --yes --prefix "$env_dir" --override-channels --channel conda-forge python=3.12 pip
+    declare -A python_versions=(
+        [reconeval-metrics]=3.12
+        [reconeval-geneformer]=3.10
+        [reconeval-uce]=3.10
+        [reconeval-scfoundation]=3.10
+    )
+    python_version="${python_versions[$env_name]:?Missing Python version for $env_name}"
+    conda create --yes --prefix "$env_dir" --override-channels --channel conda-forge \
+        "python=$python_version" pip
     "$env_python" -m pip install -r "$recipe" /opt/ReconEval
 else
     # Use the PyTorch channel for pytorch-cuda; defaults has a cluster TLS error.
     sed -i 's/  - defaults/  - pytorch/' "$recipe"
     # MuData needs scverse-misc's settings dependencies when importing scvi.
     if [[ "$env_name" == reconeval ]]; then
+        sed -i '/^dependencies:$/a\  - cuda-version=12.9' "$recipe"
         sed -i '/^dependencies:$/a\  - python-dotenv\n  - pydantic-settings' "$recipe"
         sed -i '/^  - pip:$/a\      - rapids-singlecell==0.13.0' "$recipe"
     fi
@@ -39,15 +48,26 @@ else
     if [[ "$env_name" == reconeval-scgpt || "$env_name" == reconeval-scimilarity ]]; then
         sed -i '/^  - pytorch$/a\  - nvidia' "$recipe"
     fi
+    if [[ "$env_name" == reconeval-scimilarity ]]; then
+        sed -i '/^dependencies:$/a\  - cuda-version=12.4' "$recipe"
+    fi
     # Keep scGPT's Torch and NumPy versions during pip dependency resolution.
     if [[ "$env_name" == reconeval-scgpt ]]; then
+        # pytorch-cuda alone can resolve a CUDA 13 libcurand into this CUDA 12 env.
+        sed -i '/^dependencies:$/a\  - cuda-version=12.1' "$recipe"
         sed -i '/^  - pip:$/a\      - -r /opt/ReconEval/docker/scgpt_requirements.txt' "$recipe"
     fi
     # STATE uses reconeval-state; its scikit-learn requirement conflicts with CellFlow.
     if [[ "$env_name" == reconeval-pancellflow ]]; then
         sed -i -e '/^      - arc-state$/d' -e '/^      - cell-load$/d' "$recipe"
+        sed -i '/^  - pip:$/a\      - nvidia-cuda-runtime-cu12==12.9.79' "$recipe"
     fi
     conda env create --prefix "$env_dir" --file "$recipe"
+fi
+
+# Catch mixed CUDA runtime dependencies before exporting the image.
+if [[ "$env_name" == reconeval-scgpt ]]; then
+    "$env_python" -c 'import torch, scgpt; assert torch.version.cuda == "12.1", torch.version.cuda'
 fi
 
 # scConcept
@@ -58,6 +78,53 @@ if [[ "$env_name" == reconeval-scconcept ]]; then
     "$env_python" -m pip install --no-deps \
         "git+https://github.com/theislab/lamin_dataloader.git@v0.1.0" \
         "git+https://github.com/theislab/scConcept.git@$scconcept_commit" "$flash_attn_wheel"
+fi
+
+# Foundation-model code; the weights stay outside the image (download_checkpoints.py).
+fm_root=/opt/foundation_models
+fetch_commit() {
+    local url=$1 commit=$2 destination=$3
+    mkdir -p "$destination"
+    git init --quiet "$destination"
+    git -C "$destination" fetch --quiet --depth 1 "$url" "$commit"
+    git -C "$destination" checkout --quiet FETCH_HEAD
+    rm -rf "$destination/.git"
+}
+
+# Geneformer
+if [[ "$env_name" == reconeval-geneformer ]]; then
+    geneformer_commit=1f7fbae4e469a5f4f1af8c111a529cfe1b3829f5
+    geneformer_src=$(mktemp -d)
+    # Fetch through the Hub API: the gene dictionaries are Git LFS files.
+    "$env_python" - "$geneformer_commit" "$geneformer_src" <<'PY'
+import sys
+from huggingface_hub import snapshot_download
+
+snapshot_download(
+    "ctheodoris/Geneformer",
+    revision=sys.argv[1],
+    local_dir=sys.argv[2],
+    allow_patterns=["geneformer/*", "setup.py", "MANIFEST.in"],
+)
+PY
+    "$env_python" -m pip install --no-deps "$geneformer_src"
+    rm -rf "$geneformer_src"
+fi
+
+# UCE
+if [[ "$env_name" == reconeval-uce ]]; then
+    uce_commit=9c416007be15ad6753dc84af4468c1dc10421ab9
+    fetch_commit https://github.com/snap-stanford/UCE "$uce_commit" "$fm_root/UCE"
+fi
+
+# scFoundation
+if [[ "$env_name" == reconeval-scfoundation ]]; then
+    scfoundation_commit=397631c495eddf9ad6644fc00c6ea8139e651245
+    scfoundation_src=$(mktemp -d)
+    fetch_commit https://github.com/biomap-research/scFoundation "$scfoundation_commit" "$scfoundation_src"
+    mkdir -p "$fm_root/scFoundation"
+    cp -r "$scfoundation_src"/{model,LICENSE,MODEL_LICENSE} "$fm_root/scFoundation/"
+    rm -rf "$scfoundation_src"
 fi
 
 # Runtime caches

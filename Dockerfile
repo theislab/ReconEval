@@ -69,6 +69,21 @@ COPY docker/cellflow_overrides.yaml ./docker/
 RUN bash docker/setup.sh envs/pancellflow.yaml reconeval-pancellflow docker/cellflow_overrides.yaml
 CMD ["-n", "reconeval-pancellflow", "python", "--version"]
 
+FROM base AS geneformer
+COPY envs/geneformer.txt ./envs/
+RUN bash docker/setup.sh envs/geneformer.txt reconeval-geneformer
+CMD ["-n", "reconeval-geneformer", "python", "--version"]
+
+FROM base AS uce
+COPY envs/uce.txt ./envs/
+RUN bash docker/setup.sh envs/uce.txt reconeval-uce
+CMD ["-n", "reconeval-uce", "python", "--version"]
+
+FROM base AS scfoundation
+COPY envs/scfoundation.txt ./envs/
+RUN bash docker/setup.sh envs/scfoundation.txt reconeval-scfoundation
+CMD ["-n", "reconeval-scfoundation", "python", "--version"]
+
 # Combined image
 FROM base AS all
 COPY --from=metrics /opt/conda/envs/reconeval-metrics /opt/conda/envs/reconeval-metrics
@@ -78,3 +93,8 @@ COPY --from=state /opt/conda/envs/reconeval-state /opt/conda/envs/reconeval-stat
 COPY --from=scconcept /opt/conda/envs/reconeval-scconcept /opt/conda/envs/reconeval-scconcept
 COPY --from=scimilarity /opt/conda/envs/reconeval-scimilarity /opt/conda/envs/reconeval-scimilarity
 COPY --from=cellflow /opt/conda/envs/reconeval-pancellflow /opt/conda/envs/reconeval-pancellflow
+COPY --from=geneformer /opt/conda/envs/reconeval-geneformer /opt/conda/envs/reconeval-geneformer
+COPY --from=uce /opt/conda/envs/reconeval-uce /opt/conda/envs/reconeval-uce
+COPY --from=uce /opt/foundation_models/UCE /opt/foundation_models/UCE
+COPY --from=scfoundation /opt/conda/envs/reconeval-scfoundation /opt/conda/envs/reconeval-scfoundation
+COPY --from=scfoundation /opt/foundation_models/scFoundation /opt/foundation_models/scFoundation
