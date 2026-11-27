@@ -24,6 +24,7 @@ os.environ.setdefault("MPLCONFIGDIR", "/tmp/reconeval-runtime-review/matplotlib"
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgb
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -120,23 +121,26 @@ def load_pca_estimates(flops_dir):
 
 
 def create_figure(values, pca):
-    """Return the FLOPs-per-latent figure (one panel per latent dimension).
+    """Return AE/VAE panels with latent-size gradients and a PCA fit reference.
 
     *values*: dict keyed by (model, latent_dim, hidden_dim, depth) → TFLOPs/epoch.
     *pca*:    dict keyed by latent_dim → fit-only TFLOPs.
     """
-    fig, axes = plt.subplots(1, len(LATENTS), figsize=(4 * len(LATENTS), 4),
+    fig, axes = plt.subplots(1, 2, figsize=(9, 4),
                              sharey=True, layout="constrained")
-    for ax, latent in zip(axes, LATENTS):
-        for model in ("mlAE", "nlscVI"):
-            color, marker = MODELS[model]
+    pca_fit = pca[LATENTS[0]]
+    assert np.allclose(list(pca.values()), pca_fit, rtol=1e-12, atol=0)
+    for ax, model in zip(axes, ("mlAE", "nlscVI")):
+        base, marker = MODELS[model]
+        for latent, shade in zip(LATENTS, np.linspace(0.35, 1, len(LATENTS))):
+            color = 1 - shade * (1 - np.array(to_rgb(base)))
             ys = [values[model, latent, hidden, depth] for hidden, depth in ARCHITECTURES]
             ax.plot(range(len(ARCHITECTURES)), ys, color=color, marker=marker,
-                    label=f"{LABELS[model]} / epoch")
-        ax.axhline(pca[latent], color=MODELS["PCA"][0],
+                    label=str(latent))
+        ax.axhline(pca_fit, color=MODELS["PCA"][0],
                    linestyle="--", label="PCA / fit (approx.)")
         ax.set(yscale="log", ylim=(0.7, 1000), xlabel="Hidden width × depth",
-               title=f"Latent dimension {latent}")
+               title=f"{LABELS[model]} / epoch")
         ax.set_xticks(
             range(len(ARCHITECTURES)),
             [f"{hidden}×{depth}" for hidden, depth in ARCHITECTURES],
@@ -144,9 +148,10 @@ def create_figure(values, pca):
         )
         ax.grid(linestyle="--", alpha=0.3)
         ax.spines[["top", "right"]].set_visible(False)
+        ax.set_axisbelow(True)
+        ax.legend(title="Latent dimension", frameon=False, loc="center right")
     axes[0].set_ylabel("TFLOPs per epoch or fit")
     axes[0].set_yticks([1, 10, 100, 1000], ["1", "10", "100", "1000"])
-    axes[0].legend(frameon=False, loc="center right")
     return fig
 
 
@@ -173,10 +178,9 @@ def main():
            else estimate_pca(args.input, flops_dir=args.flops_dir))
 
     fig = create_figure(values, pca)
-    for extension in ("png", "svg"):
-        output = args.figure_dir / f"flops_with_pca.{extension}"
-        fig.savefig(output, dpi=180)
-        print(output)
+    output = args.figure_dir / "flops_with_pca.svg"
+    fig.savefig(output)
+    print(output)
     plt.close(fig)
     for latent, tflops in pca.items():
         print(f"PCA fit only, k={latent}: {tflops:.6f} TFLOPs")

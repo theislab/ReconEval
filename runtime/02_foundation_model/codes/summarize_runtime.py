@@ -126,17 +126,19 @@ def create_figure(embed_summary, decoder_summary):
     for model, (color, marker) in MODELS.items():
         rows = embed_summary[embed_summary.model == model]
         axes[0].errorbar(rows.n_cells, rows.mean_embed_seconds, yerr=rows.std_embed_seconds,
-                         color=color, marker=marker, capsize=3, label=model)
+                         color=color, marker=marker, capsize=3,
+                         label="SCimilarity" if model == "scimilarity" else model)
     axes[0].set_title("Embedding extraction")
     axes[0].legend(frameon=False)
 
     for ax, model in zip(axes[1:], MODELS):
+        name = "SCimilarity" if model == "scimilarity" else model
         for (n_layers, n_hidden), rows in decoder_summary[decoder_summary.model == model].groupby(
                 ["n_layers", "n_hidden"]):
             ax.errorbar(rows.n_cells, rows.mean_decoder_seconds, yerr=rows.std_decoder_seconds,
                         color=HIDDEN_COLORS[n_hidden], marker=LAYER_MARKERS[n_layers],
                         capsize=3, label=f"{n_layers}x{n_hidden}")
-        ax.set_title(f"Decoder training ({model}, latent {LATENT_DIMS[model]})")
+        ax.set_title(f"Decoder training ({name}, latent {LATENT_DIMS[model]})")
         if model == "scConcept":
             ax.legend(frameon=False, fontsize="small", ncols=1, loc="upper right")
 

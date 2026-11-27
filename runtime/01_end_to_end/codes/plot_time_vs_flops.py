@@ -201,10 +201,9 @@ def main():
         args.measurements_dir / "runtime_flops_summary.csv", index=False)
 
     fig = create_figure(summary, pca_summary, latent_dim=args.latent_dim)
-    for extension in ("png", "svg"):
-        path = args.figure_dir / f"time_vs_flops_per_epoch.{extension}"
-        fig.savefig(path, dpi=180)
-        print(path)
+    path = args.figure_dir / "time_vs_flops_per_epoch.svg"
+    fig.savefig(path)
+    print(path)
     plt.close(fig)
 
     print(f"Used {len(runs)} successful runs across {len(summary)} model/configuration pairs.")

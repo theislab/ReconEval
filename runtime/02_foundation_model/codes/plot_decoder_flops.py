@@ -1,8 +1,9 @@
-"""Plot MLP decoder FLOPs using recorded epoch workloads, alongside optional SE runtime."""
+"""Compare decoder FLOPs across models, alongside optional SE runtime."""
 import argparse
 import os
 import sys
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/reconeval-runtime-review/matplotlib")
 import matplotlib
@@ -28,40 +29,41 @@ def create_figure(
     grid = pd.read_csv(flops_dir / "grid.csv")
     models = [m for m in MODELS if m in set(grid.model)]
 
-    nplots = len(models) + int(include_se_runtime)
-    ncols = min(4, nplots)
-    nrows = (nplots + ncols - 1) // ncols
-    fig, axes = plt.subplots(nrows, ncols, figsize=(4 * ncols, 4 * nrows),
-                             layout="constrained", squeeze=False)
-    offset = int(include_se_runtime)
-    first_flops_ax = axes.flat[offset]
+    if include_se_runtime:
+        # Match the plotting area in the FM cell-count figure.
+        reference = ET.parse(RESULTS / "figures/luca_runtime_fm.svg").find(
+            ".//{*}clipPath/{*}rect")
+        panel_width = float(reference.attrib["width"]) / 72
+        panel_height = float(reference.attrib["height"]) / 72
+        fig, axes = plt.subplots(1, 2, figsize=(10, panel_height + 1.1))
+        fig.subplots_adjust(left=0.06, right=0.98,
+                            bottom=0.8 / (panel_height + 1.1),
+                            top=1 - 0.3 / (panel_height + 1.1),
+                            wspace=(9.2 - 2 * panel_width) / panel_width)
+    else:
+        fig, axes = plt.subplots(1, 1, figsize=(5, 4), layout="constrained", squeeze=False)
+        axes = axes.ravel()
 
-    for index, (ax, model) in enumerate(zip(axes.flat[offset:], models), start=offset):
-        if index != offset:
-            ax.sharey(first_flops_ax)
+    ax = axes[-1]
+    for model in models:
         rows = grid[grid.model == model].sort_values(["hidden_dim", "depth"])
         color, marker = MODELS[model]
+        name = "SCimilarity" if model == "scimilarity" else model
         ax.plot(range(len(rows)), rows.train_val_dense_tflops_per_epoch,
-                color=color, marker=marker)
-        ax.set(
-            yscale="log",
-            xlabel="Hidden width × depth",
-            title=f"Decoder FLOPs ({model}, latent {rows.latent_dim.iloc[0]})",
-        )
-        ax.set_xticks(
-            range(len(rows)),
-            [f"{h}×{d}" for h, d in zip(rows.hidden_dim, rows.depth)],
-            rotation=90, fontsize=8,
-        )
-        ax.yaxis.set_minor_formatter(NullFormatter())
-        show_ylabel = index == offset or index % ncols == 0
-        ax.tick_params(axis="y", labelleft=show_ylabel)
-        if show_ylabel:
-            ax.set_ylabel("TFLOPs per epoch")
+                color=color, marker=marker, label=f"{name} (latent {rows.latent_dim.iloc[0]})")
+    ax.set(yscale="log", xlabel="Hidden width × depth",
+           ylabel="TFLOPs per epoch", title="Decoder FLOPs")
+    ax.set_xticks(
+        range(len(rows)), [f"{h}×{d}" for h, d in zip(rows.hidden_dim, rows.depth)],
+        rotation=90, fontsize=8,
+    )
+    ax.set_yticks([20, 50, 100, 200, 500], ["20", "50", "100", "200", "500"])
+    ax.yaxis.set_minor_formatter(NullFormatter())
+    ax.legend(loc="upper left", frameon=False)
 
     if include_se_runtime:
         from plot_se_time_vs_flops_per_epoch import load_summary
-        ax = axes.flat[0]
+        ax = axes[0]
         x, mean, sd = zip(*load_summary(flops_path=flops_dir / "grid.csv",
                                         runtime_csv=runtime_csv))
         color, marker = MODELS["SE"]
@@ -77,15 +79,11 @@ def create_figure(
         ax.margins(y=0.15)
         ax.legend(loc="upper left", frameon=False)
 
-    for ax in axes.flat[:nplots]:
-        ax.title.set_fontsize(10)
+    for ax in axes:
+        ax.title.set_fontsize(12)
         ax.grid(linestyle="--", alpha=0.3)
         ax.spines[["top", "right"]].set_visible(False)
         ax.set_axisbelow(True)
-    for ax in axes.flat[nplots:]:
-        ax.set_visible(False)
-
-    first_flops_ax.set_yticks([20, 50, 100, 200, 500], ["20", "50", "100", "200", "500"])
     return fig
 
 
@@ -109,10 +107,9 @@ def main():
         runtime_csv=args.runtime_csv,
     )
     name = "decoder_flops_with_se_runtime" if args.include_se_runtime else "decoder_flops"
-    for extension in ("png", "svg"):
-        path = args.figure_dir / f"{name}.{extension}"
-        fig.savefig(path, dpi=180)
-        print(path)
+    path = args.figure_dir / f"{name}.svg"
+    fig.savefig(path)
+    print(path)
     plt.close(fig)
 
 

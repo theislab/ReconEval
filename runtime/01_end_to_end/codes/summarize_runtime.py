@@ -62,7 +62,7 @@ def collect_complexity():
 
 def create_figure(summary):
     """Return the runtime log-log figure (one panel per latent dimension)."""
-    fig, axes = plt.subplots(1, len(LATENTS), figsize=(4 * len(LATENTS), 4),
+    fig, axes = plt.subplots(1, len(LATENTS), figsize=(4.5 * len(LATENTS), 4),
                              sharey=True, layout="constrained")
     for ax, latent in zip(axes, LATENTS):
         for model, (color, marker) in MODELS.items():
