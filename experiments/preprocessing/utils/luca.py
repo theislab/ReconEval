@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 
 import zarr
 
@@ -10,6 +11,9 @@ def fix_multiciliated_key(zarr_dir):
     for p in sorted(root.iterdir()):
         if p.name.startswith(old):
             dst = p.with_name(p.name.replace(old, new, 1))
+            # Preparation overwrites groups; replace the previous run's renamed copy.
+            if dst.exists():
+                shutil.rmtree(dst)
             p.rename(dst)
             print(f"renamed: {p.name} -> {dst.name}")
 

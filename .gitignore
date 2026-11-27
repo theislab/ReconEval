@@ -43,3 +43,8 @@ slurm_error_*.txt
 # Hydra job outputs (per-run `.hydra/` and local outputs/ written by drivers)
 **/.hydra/
 **/multirun/
+.vscode/
+.venv
+results
+checkpoints/pretrained
+data
