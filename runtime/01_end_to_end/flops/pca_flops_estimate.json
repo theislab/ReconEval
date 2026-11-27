@@ -1,0 +1,153 @@
+{
+  "estimator": "runtime/01_end_to_end/codes/estimate_pca_flops.py:estimate_pca_flops",
+  "input_statistics": {
+    "source_h5ad": "/ictstr01/groups/ml01/workspace/olga.novitskaia/reconeval_data/luca/full/train.h5ad",
+    "shape": [
+      661030,
+      5983
+    ],
+    "n_nonzero": 278948441,
+    "density": 0.07053160487296997,
+    "mean_nnz_per_cell": 421.9905919549793,
+    "sum_row_nnz_squared": 161760383895.0,
+    "source": "Actual CSR X/indptr, X/data length, and X shape; no synthetic matrix."
+  },
+  "upper_triangle_only": false,
+  "include_transform": false,
+  "plot_eigh_method": "divide_and_conquer",
+  "scope": "One PCA fit, excluding projection of the training cells (include_transform=False).",
+  "comparison_note": "Neural curves show one training+validation epoch; PCA shows one fit. These are different work units.",
+  "status": "Analytical FLOP estimates, not measured GPU instructions or throughput.",
+  "estimates": [
+    {
+      "eigh_method": "divide_and_conquer",
+      "shape": [
+        661030,
+        5983
+      ],
+      "nnz": 278948441,
+      "density": 0.07053160487296997,
+      "mean_nnz_per_cell": 421.9905919549793,
+      "n_comps": 10,
+      "flops": {
+        "means": 278954424.0,
+        "gram": 323520767790.0,
+        "center": 107388867.0,
+        "eigh": 999456253072.6665,
+        "ratio": 11966.0
+      },
+      "total_flops": 1323363376119.6665,
+      "share": {
+        "means": 0.00021079200847913995,
+        "gram": 0.24446858181810927,
+        "center": 8.114843506919694e-05,
+        "eigh": 0.7552394686962303,
+        "ratio": 9.042112103091753e-09
+      }
+    },
+    {
+      "eigh_method": "divide_and_conquer",
+      "shape": [
+        661030,
+        5983
+      ],
+      "nnz": 278948441,
+      "density": 0.07053160487296997,
+      "mean_nnz_per_cell": 421.9905919549793,
+      "n_comps": 32,
+      "flops": {
+        "means": 278954424.0,
+        "gram": 323520767790.0,
+        "center": 107388867.0,
+        "eigh": 999456253072.6665,
+        "ratio": 11966.0
+      },
+      "total_flops": 1323363376119.6665,
+      "share": {
+        "means": 0.00021079200847913995,
+        "gram": 0.24446858181810927,
+        "center": 8.114843506919694e-05,
+        "eigh": 0.7552394686962303,
+        "ratio": 9.042112103091753e-09
+      }
+    },
+    {
+      "eigh_method": "divide_and_conquer",
+      "shape": [
+        661030,
+        5983
+      ],
+      "nnz": 278948441,
+      "density": 0.07053160487296997,
+      "mean_nnz_per_cell": 421.9905919549793,
+      "n_comps": 128,
+      "flops": {
+        "means": 278954424.0,
+        "gram": 323520767790.0,
+        "center": 107388867.0,
+        "eigh": 999456253072.6665,
+        "ratio": 11966.0
+      },
+      "total_flops": 1323363376119.6665,
+      "share": {
+        "means": 0.00021079200847913995,
+        "gram": 0.24446858181810927,
+        "center": 8.114843506919694e-05,
+        "eigh": 0.7552394686962303,
+        "ratio": 9.042112103091753e-09
+      }
+    },
+    {
+      "eigh_method": "divide_and_conquer",
+      "shape": [
+        661030,
+        5983
+      ],
+      "nnz": 278948441,
+      "density": 0.07053160487296997,
+      "mean_nnz_per_cell": 421.9905919549793,
+      "n_comps": 512,
+      "flops": {
+        "means": 278954424.0,
+        "gram": 323520767790.0,
+        "center": 107388867.0,
+        "eigh": 999456253072.6665,
+        "ratio": 11966.0
+      },
+      "total_flops": 1323363376119.6665,
+      "share": {
+        "means": 0.00021079200847913995,
+        "gram": 0.24446858181810927,
+        "center": 8.114843506919694e-05,
+        "eigh": 0.7552394686962303,
+        "ratio": 9.042112103091753e-09
+      }
+    },
+    {
+      "eigh_method": "divide_and_conquer",
+      "shape": [
+        661030,
+        5983
+      ],
+      "nnz": 278948441,
+      "density": 0.07053160487296997,
+      "mean_nnz_per_cell": 421.9905919549793,
+      "n_comps": 2048,
+      "flops": {
+        "means": 278954424.0,
+        "gram": 323520767790.0,
+        "center": 107388867.0,
+        "eigh": 999456253072.6665,
+        "ratio": 11966.0
+      },
+      "total_flops": 1323363376119.6665,
+      "share": {
+        "means": 0.00021079200847913995,
+        "gram": 0.24446858181810927,
+        "center": 8.114843506919694e-05,
+        "eigh": 0.7552394686962303,
+        "ratio": 9.042112103091753e-09
+      }
+    }
+  ]
+}

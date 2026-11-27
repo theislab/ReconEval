@@ -1,0 +1,14 @@
+defaults:
+  - luca
+  - _self_
+
+# LuCA runtime subsets with the 5983 precomputed HVGs; train_runtime.sh sets
+# path to data/luca/runtime/<n_cells>.
+path: ???
+eval_path: ${data.path}/expression.zarr
+split_comb: ${data.path}/split_metadata.zarr
+input_dim: 5983
+
+model_specific:
+  PCA:
+    train_path: ${data.path}/train.h5ad  # same training cells as the neural models

@@ -1,0 +1,48 @@
+{
+  "method": "FlopCounterMode",
+  "torch_version": "2.5.1",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "decoder": "MLPDecoder",
+  "n_genes": 5983,
+  "n_train": 661030,
+  "n_val": 110722,
+  "data_dir": "results/luca-runtime-fm/embed",
+  "profile_batch_size": 256,
+  "sources": {
+    "scimilarity": {
+      "path": "results/luca-runtime-fm/embed/scimilarity/full/repeat-1/emb_combined",
+      "latent_dim": 128
+    },
+    "scGPT": {
+      "path": "results/luca-runtime-fm/embed/scGPT/full/repeat-1/emb_combined",
+      "latent_dim": 512
+    },
+    "scConcept": {
+      "path": "results/luca-runtime-fm/embed/scConcept/full/repeat-1/emb_combined",
+      "latent_dim": 512
+    },
+    "Geneformer": {
+      "path": "results/luca-runtime-fm/embed/Geneformer/full/repeat-1/emb_combined",
+      "latent_dim": 1152
+    },
+    "UCE": {
+      "path": "results/luca-runtime-fm/embed/UCE/full/repeat-1/emb_combined",
+      "latent_dim": 1280
+    },
+    "SE": {
+      "path": "results/luca-runtime-fm/embed/SE/full/repeat-1/emb_combined",
+      "latent_dim": 2058
+    },
+    "scFoundation": {
+      "path": "results/luca-runtime-fm/embed/scFoundation/full/repeat-1/emb_combined",
+      "latent_dim": 3072
+    }
+  },
+  "scope": "Supported matrix FLOPs; first real LuCA expression/embedding batches, scaled to saved epoch workloads; multiply-add = 2",
+  "scaling": "Mean training/validation cells processed per epoch; unmeasured depths use depth 1 of the same model and width",
+  "excluded": [
+    "FM embedding creation",
+    "Optimizer steps",
+    "Unsupported elementwise operations and I/O"
+  ]
+}
