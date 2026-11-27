@@ -1,0 +1,34 @@
+# @package _global_
+# Demo-specific evaluation config for the 500-cell / 500-gene LuCA subset.
+# Extends base_eval_decode.yaml; override pretrained/decoder/metric on the CLI.
+#
+# Usage:
+#   python experiments/02_foundation_model/codes/eval_decoder_statistical.py \
+#       --config-dir custom_datasets_demo/02_foundation_model/configs \
+#       --config-name base_eval_decode_demo \
+#       pretrained=SE \
+#       decoder=MLP \
+#       metric=decode_statistical_demo \
+#       decoder.load.path=<checkpoint.ckpt> \
+#       decoder.load.model_name=demo \
+#       output.save_path=<results.csv>
+
+defaults:
+  - base_eval_decode
+  - override data: custom_luca_demo
+  - _self_
+
+# 500 HVGs in the demo subset
+gene_dim: 500
+
+# Evaluate on test split only
+train_fraction: 0
+test_fraction: 1.0
+
+# Embeddings written by extract_embeddings.sbatch; uses pretrained model name
+emb_zarr_path: data/luca/demo/embeddings/${pretrained.meta.name}/grouped.zarr
+
+# Checkpoint label used for output file naming
+decoder:
+  load:
+    model_name: demo

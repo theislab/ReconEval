@@ -1,0 +1,17 @@
+defaults:
+  - decode_statistical
+  - projector: PCA
+  - _self_
+
+# Overrides for the LuCA demo.
+evaluator:
+  _target_: sc_reconstruction.metrics.distributional.ProjectionMetricsBatchEvaluator
+  mode: decode
+  emb_zarr_path: ${emb_zarr_path}
+  reference_batch: null
+  input_key: X
+  split_key:
+    - cell_type
+    - dataset
+    - origin
+  max_workers: 1
