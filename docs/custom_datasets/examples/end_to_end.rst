@@ -729,11 +729,12 @@ Runtime
 
 **TFLOPs vs width × depth**
 
-.. figure:: /_static/demo/flops_with_pca.png
-   :width: 100%
+.. figure:: /_static/demo/flops_with_pca.svg
+   :width: 75%
    :alt: AE/VAE and PCA TFLOPs across architectures and latent dimensions.
 
    TFLOPs across widths x depths and latent dimensions on full LuCA. AE/VAE: TFLOPs per training/validation epoch; dashed PCA: estimated TFLOPs per fit, excluding projection.
+   Left: AE; right: VAE. Darker colours indicate larger latent dimensions.
 
 
 .. _custom-data-e2e-time-estimates:

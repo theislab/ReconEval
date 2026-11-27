@@ -645,11 +645,11 @@ Runtime
 **Decoder time and TFLOPs**
 
 .. figure:: /_static/demo/decoder_flops_with_se_runtime.svg
-   :width: 100%
+   :width: 75%
    :alt: MLP decoder training time per epoch and decoder TFLOPs across architectures for seven foundation models.
 
-   First panel: MLP training time per epoch vs TFLOPs per epoch on SE embeddings; mean ± SD over 3 runs.
-   Remaining panels: MLP TFLOPs per epoch vs width × depth, one panel per foundation model.
+   Left panel: MLP training time per epoch vs TFLOPs per epoch on SE embeddings; mean ± SD over 3 runs.
+   Right panel: MLP TFLOPs per epoch vs width × depth for all seven foundation models.
    On the full LuCA dataset.
 
 .. dropdown:: Note: details on plots
