@@ -102,11 +102,8 @@ All groups must use the same gene columns in the same order.
 
 **Add Ensembl IDs**
 
-In the ``reconeval`` environment, use the input dataset's gene annotations to
-add Ensembl IDs in expression-column order. Replace ``gene_name`` and
-``ensembl_id`` below with your ``.var`` column names; if Ensembl IDs are stored
-in ``.var_names``, use ``var.index`` instead of ``var["ensembl_id"]``.
-Each gene name must map to one Ensembl ID.
+In ``reconeval``, run the example below with your gene annotation columns
+to add Ensembl IDs in expression-column order.
 
 .. code-block:: python
 
@@ -114,6 +111,7 @@ Each gene name must map to one Ensembl ID.
    import zarr
    from anndata.io import read_elem
 
+   # Original .h5ad from Data preparation, e.g. core_250130.h5ad for LuCA
    with h5py.File("/path/to/input.h5ad", "r") as source:
        var = read_elem(source["var"])
    gene_ids = dict(zip(var["gene_name"], var["ensembl_id"]))
@@ -122,11 +120,8 @@ Each gene name must map to one Ensembl ID.
        gene_ids[gene].split(".")[0] for gene in expression.attrs["var_names"]
    ]
 
-This removes version suffixes from Ensembl IDs. For both **scConcept** and
-**Geneformer**, set ``data_args.var_names_path`` to this expression store and
-``data_args.var_names_key`` to ``var_ensembl_ids_38``. **Geneformer** still reads
-raw counts from ``counts.zarr`` via ``data_args.comb_meta_root``; both stores
-must have the same gene columns in the same order.
+For **scConcept** and **Geneformer**, set ``data_args.var_names_path`` to
+this store and ``data_args.var_names_key`` to ``var_ensembl_ids_38``.
 
 **Split metadata**
 
@@ -195,11 +190,9 @@ these stores:
 Replace ``<model>`` and ``<embedding_key>`` with ``SE``, ``scGPT``,
 ``scConcept``, ``scimilarity``, ``Geneformer``, ``UCE``, or ``scFoundation``.
 
-The ``--all-genes-zarr`` and ``--target-genes-zarr`` arguments read only the
-root ``var_names`` attribute. When reconstructing the same genes, pass the
-expression store used in the combination step for both arguments
-(``expression_for_fm.zarr`` here, or ``expression.zarr`` in the demo).
-Its gene list must match the ``X`` column order in both combined stores.
+For all genes, pass the expression store to both ``--all-genes-zarr`` and
+``--target-genes-zarr``. Its ``var_names`` must match ``X`` column order
+in both combined stores.
 
 To reconstruct a subset, create a metadata-only store listing the desired
 genes in decoder-output order:
@@ -211,9 +204,8 @@ genes in decoder-output order:
    target = zarr.open_group("/path/to/mydata/target_genes.zarr", mode="a")
    target.attrs["var_names"] = ["GENE_A", "GENE_B"]  # replace with your genes
 
-Pass this store as ``--target-genes-zarr`` and keep ``--all-genes-zarr`` pointing
-to the expression store. Every target gene must exist in its ``var_names``.
-Evaluation expression must use the same target genes in the same order.
+Pass this store as ``--target-genes-zarr``; evaluation must use the same
+genes and order.
 
 Reference PCA
 ^^^^^^^^^^^^^

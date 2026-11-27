@@ -664,7 +664,11 @@ Runtime
    - **Hidden widths × depths:** 1024, 2048, 4096 × 1, 2, 4 for the runtime MLP;
      depths 1–4 for TFLOPs
    - **Embedding dimensions:** 2058 for the MLP runtime; each model's own dimension
-   - **Data:** full LuCA with 892296 cells
+   - **Data:**
+
+     - Full LuCA with 892,296 cells
+     - Approximately 395,000 training cells and 109,824 validation cells per epoch
+
    - **Hardware:**
 
      - **GPU:** 1 × NVIDIA H100 80GB
