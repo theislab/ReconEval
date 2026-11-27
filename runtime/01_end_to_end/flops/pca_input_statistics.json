@@ -1,0 +1,12 @@
+{
+  "source_h5ad": "/ictstr01/groups/ml01/workspace/olga.novitskaia/reconeval_data/luca/full/train.h5ad",
+  "shape": [
+    661030,
+    5983
+  ],
+  "n_nonzero": 278948441,
+  "density": 0.07053160487296997,
+  "mean_nnz_per_cell": 421.9905919549793,
+  "sum_row_nnz_squared": 161760383895.0,
+  "source": "Actual CSR X/indptr, X/data length, and X shape; no synthetic matrix."
+}

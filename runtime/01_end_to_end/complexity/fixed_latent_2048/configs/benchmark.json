@@ -1,0 +1,29 @@
+{
+  "models": ["mlAE", "nlscVI"],
+  "repeats": 3,
+  "seed": 42,
+  "data_dir": "data/luca/runtime/full",
+  "n_genes": 5983,
+  "n_train": 661030,
+  "n_val": 110722,
+  "batch_size": 256,
+  "results_dir": "results/luca-runtime-complexity",
+  "existing_runtime_dir": "results/luca-runtime/runs",
+  "configurations": [
+    {"latent_dim": 2048, "hidden_dim": 1024, "depth": 1, "reuse_existing": true},
+    {"latent_dim": 2048, "hidden_dim": 1024, "depth": 2, "reuse_existing": false},
+    {"latent_dim": 2048, "hidden_dim": 1024, "depth": 4, "reuse_existing": false},
+    {"latent_dim": 2048, "hidden_dim": 2048, "depth": 1, "reuse_existing": false},
+    {"latent_dim": 2048, "hidden_dim": 2048, "depth": 2, "reuse_existing": false},
+    {"latent_dim": 2048, "hidden_dim": 2048, "depth": 4, "reuse_existing": false},
+    {"latent_dim": 2048, "hidden_dim": 4096, "depth": 1, "reuse_existing": false},
+    {"latent_dim": 2048, "hidden_dim": 4096, "depth": 2, "reuse_existing": false},
+    {
+      "latent_dim": 2048,
+      "hidden_dim": 4096,
+      "depth": 4,
+      "reuse_existing": true,
+      "run_dir": "results/luca-runtime-complexity/runs/{model}/full/2048_4096_4/repeat-{repeat}"
+    }
+  ]
+}

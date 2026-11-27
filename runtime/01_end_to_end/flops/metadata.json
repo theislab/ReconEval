@@ -1,0 +1,11 @@
+{
+  "method": "FlopCounterMode",
+  "torch_version": "2.5.1",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "n_genes": 5983,
+  "n_train": 661030,
+  "n_val": 110722,
+  "data_dir": "data/luca/runtime/full",
+  "profile_batch_size": 256,
+  "scope": "Supported matrix FLOPs; first real LuCA train/validation batches, scaled to full-data epochs; multiply-add = 2"
+}
